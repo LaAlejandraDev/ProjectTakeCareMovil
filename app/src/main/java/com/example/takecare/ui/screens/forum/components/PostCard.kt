@@ -18,9 +18,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.takecare.data.exampleData.sampleComments
 import com.example.takecare.data.models.Comment
@@ -31,6 +40,7 @@ import com.example.takecare.data.models.User
 fun PostCard(
     modifier: Modifier = Modifier,
     postData: Post,
+    isExpanded: Boolean = false,
     onLikeClick: () -> Unit = {},
     onViewClick: () -> Unit = {}
 ) {
@@ -48,8 +58,13 @@ fun PostCard(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CardHeader(postData)
-            CardBody(postData)
-            CardActions(onLikeClick, onViewClick)
+            CardBody(postData, isExpanded)
+            if (!isExpanded) {
+                CardActions(onLikeClick, onViewClick)
+            } else {
+                CardCommentBox()
+                CardCommentSection(postData)
+            }
         }
     }
 }
@@ -83,7 +98,7 @@ fun CardHeader(postData: Post) {
 }
 
 @Composable
-fun CardBody(postData: Post) {
+fun CardBody(postData: Post, isExpanded: Boolean = false) {
     val commentsForPost = sampleComments.filter { it.postId == postData.id }
     val topComment = commentsForPost.maxByOrNull { it.likes }
 
@@ -100,9 +115,68 @@ fun CardBody(postData: Post) {
             maxLines = 3,
             overflow = TextOverflow.Ellipsis
         )
+        if (!isExpanded) {
+            topComment?.let {
+                Comment(it, isTop = true)
+            }
+        }
+    }
+}
 
-        topComment?.let {
-            Comment(it, isTop = true)
+@Composable
+fun CardCommentBox(
+    modifier: Modifier = Modifier,
+    onSend: (String) -> Unit = {}
+) {
+    var response by remember { mutableStateOf("") }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        OutlinedTextField(
+            value = response,
+            onValueChange = { response = it },
+            placeholder = { Text("Deja una respuesta...") },
+            singleLine = true,
+            shape = CircleShape,
+            modifier = Modifier
+                .weight(1f)
+                .height(50.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.Transparent,
+                focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+            )
+        )
+
+        Button(
+            onClick = {
+                if (response.isNotBlank()) {
+                    onSend(response)
+                    response = ""
+                }
+            },
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .size(50.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) {
+            Icon(Icons.Default.Check, contentDescription = "Enviar")
+        }
+    }
+}
+
+@Composable
+fun CardCommentSection(postData: Post) {
+    val commentList = sampleComments.filter { it.postId == postData.id }
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        commentList.forEach { item ->
+            Comment(item, modifier = Modifier.fillMaxWidth())
         }
     }
 }

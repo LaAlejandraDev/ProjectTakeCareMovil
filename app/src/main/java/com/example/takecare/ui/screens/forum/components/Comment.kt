@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.dp
 import com.example.takecare.data.models.Comment
 
 @Composable
-fun Comment(comment: Comment, isTop: Boolean = false) {
+fun Comment(comment: Comment, isTop: Boolean = false, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(4.dp)
             .background(

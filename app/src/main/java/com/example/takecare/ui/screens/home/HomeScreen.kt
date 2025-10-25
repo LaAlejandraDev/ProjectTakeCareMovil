@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -22,13 +23,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.takecare.ui.components.FloatingPostButton
 import com.example.takecare.ui.navigation.HomeRoutes
 import com.example.takecare.ui.screens.forum.ForumCreatePost
+import com.example.takecare.ui.screens.forum.ForumDetailsPost
 import com.example.takecare.ui.screens.forum.ForumScreen
+import com.example.takecare.ui.screens.forum.ForumViewModel
 
 @Composable
 fun HomeScreen() {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route ?: HomeRoutes.Home.route
+
+    val forumViewModel : ForumViewModel = viewModel()
 
     Scaffold (
         modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant),
@@ -45,14 +50,14 @@ fun HomeScreen() {
         NavHost(
             navController = navController,
             startDestination = HomeRoutes.Home.route,
-            modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState())
+            modifier = Modifier.padding(innerPadding)
         ) {
-            composable(HomeRoutes.Home.route) { ForumScreen() }
+            composable(HomeRoutes.Home.route) { ForumScreen(forumViewModel, navController) }
             composable(HomeRoutes.Messages.route) { MessagesScreen() }
             composable(HomeRoutes.Diary.route) { DiaryScreen() }
             composable(HomeRoutes.Profile.route) { ProfileScreen() }
             composable(HomeRoutes.CreatePost.route) { ForumCreatePost() }
-            composable(HomeRoutes.CreatePost.route) { ForumCreatePost() }
+            composable(HomeRoutes.OpenPost.route) { ForumDetailsPost(forumViewModel) }
         }
     }
 }
