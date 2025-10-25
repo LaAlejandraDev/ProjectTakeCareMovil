@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,19 +38,23 @@ fun ForumScreen(viewModel: ForumViewModel, navController: NavController) {
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        SearchBarComponent(
-            query = text,
-            onQueryChange = {
-                text = it
-            }
-        )
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(filteredPosts, key = { it.id }) { item ->
+            item {
+                SearchBarComponent(
+                    query = text,
+                    onQueryChange = {
+                        text = it
+                    }
+                )
+            }
+
+            items(filteredPosts) { item ->
                 PostCard(
                     postData = item,
                     onViewClick = {

@@ -144,9 +144,9 @@ fun CardCommentBox(
             shape = CircleShape,
             modifier = Modifier
                 .weight(1f)
-                .height(50.dp),
+                .height(54.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color.Transparent,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                 focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
             )
         )
@@ -160,7 +160,7 @@ fun CardCommentBox(
             },
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
-                .size(50.dp),
+                .size(54.dp),
             contentPadding = PaddingValues(0.dp)
         ) {
             Icon(Icons.Default.Check, contentDescription = "Enviar")
