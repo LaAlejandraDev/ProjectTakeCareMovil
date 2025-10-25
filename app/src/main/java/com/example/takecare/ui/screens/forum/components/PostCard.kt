@@ -1,13 +1,11 @@
 package com.example.takecare.ui.screens.forum.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -29,12 +27,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.takecare.data.exampleData.sampleComments
+import com.example.takecare.data.exampleData.sampleUsers
 import com.example.takecare.data.models.Comment
 import com.example.takecare.data.models.Post
-import com.example.takecare.data.models.User
+import com.example.takecare.ui.screens.forum.ForumViewModel
+import java.util.Date
 
 @Composable
 fun PostCard(
@@ -62,7 +62,7 @@ fun PostCard(
             if (!isExpanded) {
                 CardActions(onLikeClick, onViewClick)
             } else {
-                CardCommentBox()
+                CardCommentBox(postData = postData)
                 CardCommentSection(postData)
             }
         }
@@ -98,8 +98,8 @@ fun CardHeader(postData: Post) {
 }
 
 @Composable
-fun CardBody(postData: Post, isExpanded: Boolean = false) {
-    val commentsForPost = sampleComments.filter { it.postId == postData.id }
+fun CardBody(postData: Post, isExpanded: Boolean = false, forumViewModel: ForumViewModel = viewModel()) {
+    val commentsForPost = forumViewModel.comments.filter { it.postId == postData.id }
     val topComment = commentsForPost.maxByOrNull { it.likes }
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -117,7 +117,7 @@ fun CardBody(postData: Post, isExpanded: Boolean = false) {
         )
         if (!isExpanded) {
             topComment?.let {
-                Comment(it, isTop = true)
+                CommentComponent(it, isTop = true)
             }
         }
     }
@@ -126,9 +126,19 @@ fun CardBody(postData: Post, isExpanded: Boolean = false) {
 @Composable
 fun CardCommentBox(
     modifier: Modifier = Modifier,
-    onSend: (String) -> Unit = {}
+    forumViewModel: ForumViewModel = viewModel(),
+    postData: Post
 ) {
     var response by remember { mutableStateOf("") }
+
+    fun createNewComment() {
+        val newComment = Comment(
+            sampleComments.size + 1, postData.id, "2025-10-25", response,
+            sampleUsers[0], 0
+        )
+        forumViewModel.asignNewComment(comment = newComment)
+        forumViewModel.createComment(newComment)
+    }
 
     Row(
         modifier = modifier
@@ -153,10 +163,7 @@ fun CardCommentBox(
 
         Button(
             onClick = {
-                if (response.isNotBlank()) {
-                    onSend(response)
-                    response = ""
-                }
+                createNewComment()
             },
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -169,14 +176,14 @@ fun CardCommentBox(
 }
 
 @Composable
-fun CardCommentSection(postData: Post) {
-    val commentList = sampleComments.filter { it.postId == postData.id }
+fun CardCommentSection(postData: Post, forumViewModel: ForumViewModel = viewModel()) {
+    val commentList = forumViewModel.comments.filter { it.postId == postData.id }
     Column (
         modifier = Modifier
             .fillMaxWidth()
     ) {
         commentList.forEach { item ->
-            Comment(item, modifier = Modifier.fillMaxWidth())
+            CommentComponent(item, modifier = Modifier.fillMaxWidth())
         }
     }
 }

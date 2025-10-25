@@ -1,23 +1,36 @@
 package com.example.takecare.ui.screens.forum.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.takecare.data.models.Comment
+import com.example.takecare.ui.screens.forum.ForumViewModel
 
 @Composable
-fun Comment(comment: Comment, isTop: Boolean = false, modifier: Modifier = Modifier) {
+fun CommentComponent(
+    comment: Comment,
+    isTop: Boolean = false,
+    modifier: Modifier = Modifier,
+    forumViewModel: ForumViewModel = viewModel()
+) {
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -27,10 +40,19 @@ fun Comment(comment: Comment, isTop: Boolean = false, modifier: Modifier = Modif
                 else Color.Transparent,
                 shape = RoundedCornerShape(8.dp)
             )
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(8.dp)
+            .clickable {
+                forumViewModel.incrementLikes(comment.id)
+            },
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Avatar(comment.user.getInitials(), size = 24.dp)
+        Column (
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Avatar(comment.user.getInitials(), size = 24.dp)
+            Text(comment.likes.toString(), style = MaterialTheme.typography.bodySmall)
+        }
         Column {
             Text(
                 text = comment.user.userName,

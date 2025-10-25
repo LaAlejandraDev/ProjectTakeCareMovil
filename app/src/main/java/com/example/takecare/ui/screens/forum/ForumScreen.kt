@@ -28,7 +28,7 @@ fun ForumScreen(viewModel: ForumViewModel, navController: NavController) {
     val posts = viewModel.posts.value
 
     val filteredPosts = posts.filter {
-        it.title.contains(text, ignoreCase = true)
+        it!!.title.contains(text, ignoreCase = true)
     }
 
 
@@ -56,7 +56,7 @@ fun ForumScreen(viewModel: ForumViewModel, navController: NavController) {
 
             items(filteredPosts) { item ->
                 PostCard(
-                    postData = item,
+                    postData = item!!,
                     onViewClick = {
                         viewModel.selectPost(item)
                         navController.navigate(HomeRoutes.OpenPost.route)

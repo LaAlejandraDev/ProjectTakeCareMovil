@@ -50,7 +50,7 @@ val sampleUsers = listOf(
     )
 )
 
-val samplePosts = listOf(
+val samplePosts = mutableListOf<Post?>(
     Post(
         id = 1,
         title = "¿Cómo manejar la ansiedad en exámenes?",
@@ -93,7 +93,7 @@ val samplePosts = listOf(
     )
 )
 
-val sampleComments = listOf(
+val sampleComments = mutableListOf<Comment?>(
     Comment(
         id = 1,
         postId = 1,

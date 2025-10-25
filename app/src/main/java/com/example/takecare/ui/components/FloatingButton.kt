@@ -26,12 +26,12 @@ fun FloatingPostButton(
         elevation = FloatingActionButtonDefaults.elevation(
             defaultElevation = 6.dp,
             pressedElevation = 10.dp
-        )
+        ),
+        modifier = Modifier.size(48.dp)
     ) {
         Icon(
             imageVector = Icons.Default.Add,
             contentDescription = "Crear post",
-            modifier = Modifier.size(28.dp)
         )
     }
 }

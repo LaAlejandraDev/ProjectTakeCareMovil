@@ -33,14 +33,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.takecare.data.exampleData.samplePosts
+import com.example.takecare.data.exampleData.sampleUsers
+import com.example.takecare.data.models.Post
 import com.example.takecare.data.models.PostType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ForumCreatePost() {
+fun ForumCreatePost(forumViewModel: ForumViewModel = viewModel()) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(PostType.QUESTION) }
+
+    fun createNewPost() {
+        // TODO: Asignar los elementos correspondientes como usuario y fecha
+        val newPostCreated = Post(
+            samplePosts.size + 1, title, content, "2025-10-25", selectedType,
+            sampleUsers[0], 0, 0
+        )
+
+        forumViewModel.asingNewPost(newPostCreated)
+        forumViewModel.createPost(newPostCreated)
+    }
 
 
     Column(
@@ -80,7 +95,9 @@ fun ForumCreatePost() {
 
         Text("Tipo de post:", style = MaterialTheme.typography.bodyMedium)
         Row (
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             PostType.entries.forEach { type ->
@@ -110,7 +127,9 @@ fun ForumCreatePost() {
         Button(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
-            onClick = { }
+            onClick = {
+                createNewPost()
+            }
         ) {
             Text("Publicar", color = Color.White)
         }

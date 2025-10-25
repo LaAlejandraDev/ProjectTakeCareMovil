@@ -7,4 +7,9 @@ data class Comment (
     val content: String,
     val user: User,
     val likes: Int = 0
-)
+) {
+    fun comprobateComment() : Boolean {
+        if (this.content.length < 25) return false
+        return true
+    }
+}
