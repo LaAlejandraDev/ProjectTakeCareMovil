@@ -10,14 +10,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.takecare.ui.navigation.HomeRoutes
 
 @Composable
 fun FloatingPostButton(
-    navController: NavController
+    navController: NavController,
+    buttonSize: ButtonSize = ButtonSize.SMALL,
+    content: @Composable () -> Unit = {}
 ) {
+
     FloatingActionButton(
         onClick = { navController.navigate(HomeRoutes.CreatePost.route) },
         shape = RoundedCornerShape(16.dp),
@@ -27,11 +31,14 @@ fun FloatingPostButton(
             defaultElevation = 6.dp,
             pressedElevation = 10.dp
         ),
-        modifier = Modifier.size(48.dp)
+        modifier = Modifier.size(buttonSize.size)
     ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = "Crear post",
-        )
+        content()
     }
+}
+
+enum class ButtonSize(val size: Dp) {
+    SMALL(40.dp),
+    MEDIUM(56.dp),
+    LARGE(72.dp)
 }
