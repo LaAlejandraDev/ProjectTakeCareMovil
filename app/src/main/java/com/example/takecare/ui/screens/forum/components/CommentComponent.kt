@@ -28,22 +28,21 @@ fun CommentComponent(
     comment: Comment,
     isTop: Boolean = false,
     modifier: Modifier = Modifier,
-    forumViewModel: ForumViewModel = viewModel()
+    onClick: () -> Unit
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(4.dp)
+            .clickable {
+                onClick()
+            }
             .background(
                 if (isTop) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                 else Color.Transparent,
                 shape = RoundedCornerShape(8.dp)
             )
-            .padding(8.dp)
-            .clickable {
-                forumViewModel.incrementLikes(comment.id)
-            },
+            .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Column (

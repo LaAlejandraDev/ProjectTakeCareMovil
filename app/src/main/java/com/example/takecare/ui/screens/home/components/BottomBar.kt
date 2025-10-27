@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.example.takecare.ui.navigation.HomeRoutes
 
 @Composable
-fun BottomTabBar(navController: NavController, currentRoute: String) {
+fun BottomTabBar(navController: NavController, currentRoute: String?) {
     val items = listOf(HomeRoutes.Home, HomeRoutes.Messages, HomeRoutes.Diary, HomeRoutes.Profile)
 
     val selectedIndex = items.indexOfFirst { it.route == currentRoute }

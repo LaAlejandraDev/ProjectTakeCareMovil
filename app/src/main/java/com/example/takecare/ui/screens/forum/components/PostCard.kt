@@ -117,7 +117,7 @@ fun CardBody(postData: Post, isExpanded: Boolean = false, forumViewModel: ForumV
         )
         if (!isExpanded) {
             topComment?.let {
-                CommentComponent(it, isTop = true)
+                CommentComponent(it, isTop = true, onClick = {})
             }
         }
     }
@@ -183,7 +183,7 @@ fun CardCommentSection(postData: Post, forumViewModel: ForumViewModel = viewMode
             .fillMaxWidth()
     ) {
         commentList.forEach { item ->
-            CommentComponent(item, modifier = Modifier.fillMaxWidth())
+            CommentComponent(item, modifier = Modifier.fillMaxWidth(), onClick = {})
         }
     }
 }

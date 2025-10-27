@@ -1,11 +1,14 @@
 package com.example.takecare.ui.screens.forum
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -15,21 +18,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.takecare.ui.screens.forum.components.PostCard
+import androidx.navigation.NavController
+import com.example.takecare.ui.screens.forum.components.OpenPost
+import com.example.takecare.ui.screens.forum.components.OpenPostActions
+import com.example.takecare.ui.screens.forum.components.OpenPostAvatarHeader
+import com.example.takecare.ui.screens.forum.components.OpenPostBody
+import com.example.takecare.ui.screens.forum.components.OpenPostBottomBar
+import com.example.takecare.ui.screens.forum.components.OpenPostComments
+import com.example.takecare.ui.screens.forum.components.OpenPostHeader
 
 @Composable
-fun ForumDetailsPost(forumViewModel: ForumViewModel) {
+fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavController) {
     val openPost = forumViewModel.openPost.collectAsState().value
 
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-    ) {
-        if (openPost != null) {
-            PostCard(postData = openPost, isExpanded = true)
-        } else {
-            ErrorPost()
+    Scaffold(
+        bottomBar = {
+            OpenPostBottomBar()
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+        ) {
+            OpenPost (modifier = Modifier.fillMaxSize().padding(12.dp)){
+                OpenPostHeader(
+                    rootNavController = rootNavController
+                )
+                OpenPostBody(openPost)
+                OpenPostActions(openPost)
+                OpenPostAvatarHeader(openPost)
+                OpenPostComments(openPost)
+            }
         }
     }
 }

@@ -77,3 +77,58 @@ fun BadgeComponent(
         }
     }
 }
+
+@Composable
+fun BadgeIconComponent(
+    type: BadgeType = BadgeType.Primary,
+    modifier: Modifier = Modifier,
+    horizontalPadding: Dp = 8.dp,
+    verticalPadding: Dp = 2.dp,
+    shape: RoundedCornerShape = RoundedCornerShape(50),
+    content: @Composable () -> Unit
+) {
+    val (bgColor, contentColor) = when (type) {
+        BadgeType.Primary -> Pair(
+            MaterialTheme.colorScheme.primaryContainer,
+            MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        BadgeType.Success -> Pair(
+            MaterialTheme.colorScheme.tertiaryContainer,
+            MaterialTheme.colorScheme.onTertiaryContainer
+        )
+        BadgeType.Info -> Pair(
+            MaterialTheme.colorScheme.secondaryContainer,
+            MaterialTheme.colorScheme.onSecondaryContainer
+        )
+        BadgeType.Warning -> Pair(
+            MaterialTheme.colorScheme.surfaceVariant,
+            MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        BadgeType.Error -> Pair(
+            MaterialTheme.colorScheme.errorContainer,
+            MaterialTheme.colorScheme.onErrorContainer
+        )
+        BadgeType.Neutral -> Pair(
+            MaterialTheme.colorScheme.surface,
+            MaterialTheme.colorScheme.onSurface
+        )
+    }
+
+    Surface(
+        modifier = modifier,
+        color = bgColor,
+        contentColor = contentColor,
+        shape = shape,
+        shadowElevation = 0.dp
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.padding(
+                horizontal = horizontalPadding,
+                vertical = verticalPadding
+            )
+        ) {
+            content()
+        }
+    }
+}

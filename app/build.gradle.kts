@@ -45,6 +45,17 @@ android {
 }
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.11.0")
+
+    // Retrofit para peticiones HTTP
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+
+    // Converter para JSON con Gson
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    // OkHttp para manejo de red y logging
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
