@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,12 +22,14 @@ import com.example.takecare.data.models.Post
 import com.example.takecare.ui.navigation.HomeRoutes
 import com.example.takecare.ui.screens.forum.components.PostCard
 import com.example.takecare.ui.screens.forum.components.SearchBarComponent
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun ForumScreen(viewModel: ForumViewModel, navController: NavController) {
     var text by remember { mutableStateOf("") }
 
-    val posts = emptyList<Post>()
+    val posts by viewModel.posts.collectAsState()
 
     val filteredPosts = posts.filter {
         it.title.contains(text, ignoreCase = true)
@@ -57,9 +60,9 @@ fun ForumScreen(viewModel: ForumViewModel, navController: NavController) {
 
             items(filteredPosts) { item ->
                 PostCard(
-                    postData = item!!,
+                    postData = item,
                     onViewClick = {
-                        //viewModel.selectPost(item)
+                        viewModel.openPostSelected(item.id)
                         navController.navigate(HomeRoutes.OpenPost.route)
                     }
                 )

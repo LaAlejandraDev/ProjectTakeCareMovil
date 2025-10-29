@@ -14,15 +14,36 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.takecare.ui.components.OutlinedTextFieldComponent
 import com.example.takecare.ui.navigation.Routes
+import com.example.takecare.ui.screens.login.LoginViewModel
 
 @Composable
-fun LoginCard(navController: NavHostController) {
+fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel = viewModel()) {
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    val loginSuccess by loginViewModel.loginSuccess
+
+    LaunchedEffect(loginSuccess) {
+        if (loginSuccess) {
+            navController.navigate(Routes.Home.route) {
+                popUpTo(Routes.Login.route) { inclusive = true }
+            }
+        }
+    }
+
     OutlinedCard (
         modifier = Modifier
             .fillMaxWidth(),
@@ -43,22 +64,24 @@ fun LoginCard(navController: NavHostController) {
             OutlinedTextFieldComponent(
                 label = "e.j correo@correo.com",
                 superiorLabel = "Ingresa tu correo",
-                value = "",
+                value = email,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = { } // No hace nada por ahora
+                onValueChange = { email = it}
             )
             OutlinedTextFieldComponent(
                 isPassword = true,
                 label = "Ingresa tu clave",
                 superiorLabel = "Ingresa la clave",
-                value = "",
+                value = password,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = { } // No hace nada por ahora
+                onValueChange = { password = it }
             )
             Button(
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { navController.navigate(Routes.Home.route) }
+                onClick = {
+                    loginViewModel.loginUser(email, password)
+                }
             ) {
                 Text("Iniciar Sesion")
             }

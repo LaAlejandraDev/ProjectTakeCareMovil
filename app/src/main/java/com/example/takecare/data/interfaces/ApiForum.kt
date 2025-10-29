@@ -7,15 +7,16 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiForum {
-    @GET("getAllPost")
+    @GET("posts")
     suspend fun getAllPost(): Response<List<Post>>
 
-    @GET("getPost/{id}")
-    suspend fun getAPost(@Path("id") id: Int): Response<Post>
+    @GET("posts")
+    suspend fun getAPost(@Query("Id") id: Int): Response<List<Post>>
 
-    @POST("addPost")
+    @POST("posts")
     suspend fun addPost(@Body post: Post): Response<Boolean>
 
     @POST("likePost/{id}")

@@ -12,8 +12,8 @@ import com.example.takecare.ui.screens.register.RegisterScreen
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        //startDestination = Routes.Login.route
-        startDestination = HomeRoutes.Home.route
+        startDestination = Routes.Login.route
+        //startDestination = HomeRoutes.Home.route
     ) {
         composable(Routes.Login.route) {
             LoginScreen(navController)

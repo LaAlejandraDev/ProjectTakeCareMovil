@@ -184,7 +184,7 @@ fun OpenPostAvatarHeader(openPost: Post?) {
 
 @Composable
 fun OpenPostComments(openPost: Post?, modifier: Modifier = Modifier) {
-    val comments = emptyList<Comment>()
+    val comments = openPost?.comments.orEmpty()
 
     Surface(
         shape = RoundedCornerShape(12.dp),

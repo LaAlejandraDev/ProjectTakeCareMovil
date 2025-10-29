@@ -2,9 +2,9 @@ package com.example.takecare.data.models
 
 import com.google.gson.annotations.SerializedName
 
-data class User (
+data class User(
     @SerializedName("Id")
-    val id: Int,
+    val id: Int? = null,
     @SerializedName("Nombre")
     val name: String,
     @SerializedName("ApellidoPaterno")
@@ -16,7 +16,7 @@ data class User (
     @SerializedName("Telefono")
     val phone: String,
     @SerializedName("Country")
-    val country: String,
+    val country: String? = null,
     @SerializedName("Contrasena")
     val password: String,
     @SerializedName("imagen")
@@ -24,11 +24,11 @@ data class User (
     @SerializedName("Rol")
     val type: UserType,
     @SerializedName("Activo")
-    val isActive: Boolean,
+    val isActive: Boolean? = null,
     @SerializedName("FechaRegistro")
-    val createdAt: String,
+    val createdAt: String? = null,
     @SerializedName("UltimoAcceso")
-    val lastAccess: String,
+    val lastAccess: String? = null,
 ) {
     fun getInitials(): String {
         return name.take(1).uppercase();

@@ -8,21 +8,48 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.takecare.data.models.RegisterUserModel
 import com.example.takecare.ui.components.OutlinedTextFieldComponent
 import com.example.takecare.ui.navigation.Routes
+import com.example.takecare.ui.screens.register.RegisterViewModel
 
 @Composable
-fun RegisterCard(navController: NavHostController) {
+fun RegisterCard(navController: NavHostController, registerViewModel: RegisterViewModel = viewModel()) {
+    var name by remember { mutableStateOf("") }
+    var fatherLastName by remember { mutableStateOf("") }
+    var motherLastName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    fun createNewUser() {
+        val newUser = RegisterUserModel(
+            name = name,
+            firstLastName = fatherLastName,
+            secondLastName = motherLastName,
+            email = email,
+            phone = phoneNumber,
+            password = password,
+            role = 1
+        )
+
+        registerViewModel.createNewUser(newUser)
+    }
+
     OutlinedCard (
         modifier = Modifier
             .fillMaxWidth(),
@@ -43,29 +70,52 @@ fun RegisterCard(navController: NavHostController) {
             OutlinedTextFieldComponent(
                 label = "e.j Juan Pablo",
                 superiorLabel = "¿Cual es tu nombre?",
-                value = "",
+                value = name,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = { } // No hace nada por ahora
+                onValueChange = { name = it}
+            )
+            OutlinedTextFieldComponent(
+                label = "e.j Juan Pablo",
+                superiorLabel = "¿Cual es tu apellido paterno?",
+                value = fatherLastName,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = { fatherLastName = it}
+            )
+            OutlinedTextFieldComponent(
+                label = "e.j Juan Pablo",
+                superiorLabel = "¿Cual es tu apellido materno?",
+                value = motherLastName,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = { motherLastName = it}
             )
             OutlinedTextFieldComponent(
                 label = "e.j correo@correo.com",
                 superiorLabel = "Ingresa tu correo",
-                value = "",
+                value = email,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = { } // No hace nada por ahora
+                onValueChange = { email = it }
+            )
+            OutlinedTextFieldComponent(
+                label = "e.j Juan Pablo",
+                superiorLabel = "¿Cual es tu telefono?",
+                value = phoneNumber,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = { phoneNumber = it }
             )
             OutlinedTextFieldComponent(
                 isPassword = true,
                 label = "Ingresa tu clave",
                 superiorLabel = "Ingresa tu clave",
-                value = "",
+                value = password,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = { } // No hace nada por ahora
+                onValueChange = { password = it }
             )
             Button(
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { } // No hace nada por ahora
+                onClick = {
+                    createNewUser()
+                }
             ) {
                 Text("Crear Cuenta")
             }

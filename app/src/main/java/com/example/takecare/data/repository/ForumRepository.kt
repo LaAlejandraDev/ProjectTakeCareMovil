@@ -1,4 +1,4 @@
-package com.example.takecare.ui.screens.forum.Repository
+package com.example.takecare.data.repository
 
 import com.example.takecare.data.interfaces.ApiForum
 import com.example.takecare.data.models.Comment
@@ -10,7 +10,7 @@ class ForumRepository(private val apiService: ApiForum) {
         return apiService.getAllPost()
     }
 
-    suspend fun getAPost(id: Int): Response<Post> {
+    suspend fun getAPost(id: Int): Response<List<Post>> {
         return apiService.getAPost(id)
     }
 

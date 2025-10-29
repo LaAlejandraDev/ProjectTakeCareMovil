@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,7 +30,7 @@ import com.example.takecare.ui.screens.forum.components.OpenPostHeader
 
 @Composable
 fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavController) {
-    val openPost = forumViewModel.openPost.collectAsState().value
+    val openPost by forumViewModel.openPost.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -43,14 +44,18 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            OpenPost (modifier = Modifier.fillMaxSize().padding(12.dp)){
-                OpenPostHeader(
-                    rootNavController = rootNavController
-                )
-                OpenPostBody(openPost)
-                OpenPostActions(openPost)
-                OpenPostAvatarHeader(openPost)
-                OpenPostComments(openPost)
+            if (openPost != null) {
+                OpenPost (modifier = Modifier.fillMaxSize().padding(12.dp)){
+                    OpenPostHeader(
+                        rootNavController = rootNavController
+                    )
+                    OpenPostBody(openPost)
+                    OpenPostActions(openPost)
+                    OpenPostAvatarHeader(openPost)
+                    OpenPostComments(openPost)
+                }
+            } else {
+                ErrorPost()
             }
         }
     }

@@ -20,8 +20,8 @@ class ForumViewModel : ViewModel() {
     private val _uiEvent = MutableSharedFlow<UIEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    private val _posts = MutableStateFlow<List<Post?>>(emptyList())
-    val posts: StateFlow<List<Post?>> = _posts
+    private val _posts = MutableStateFlow<List<Post>>(emptyList())
+    val posts: StateFlow<List<Post>> = _posts
 
     private val _openPost = MutableStateFlow<Post?>(null)
     val openPost : StateFlow<Post?> = _openPost
@@ -31,9 +31,6 @@ class ForumViewModel : ViewModel() {
 
     private val _createdComment = MutableStateFlow<Comment?>(null)
     val createdComment : StateFlow<Comment?> = _createdComment
-
-    private val _commentsList = MutableStateFlow<List<Comment?>>(emptyList())
-    val commentsList : StateFlow<List<Comment?>> = _commentsList
 
     init {
         getAllPost()
@@ -50,22 +47,26 @@ class ForumViewModel : ViewModel() {
                     _uiEvent.emit(UIEvent.Showsnackbar("Error al obtener los post " + response.code()))
                 }
             } catch (e: Exception) {
-                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
+                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor " + e.message))
             }
         }
     }
 
     fun openPostSelected(id: Int) {
+        Log.i("POSTINFO", "Se abrio el post")
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerForum.getAPost(id)
                 if (response.isSuccessful) {
-                    val postResponse = response.body()
+                    Log.i("POSTGET", response.body().toString())
+                    val postResponse = response.body()?.firstOrNull()
                     _openPost.value = postResponse
                 } else {
+                    Log.e("POSTGET", response.body().toString())
                     _uiEvent.emit(UIEvent.Showsnackbar("Error al abrir el post " + response.code()))
                 }
             } catch (e: Exception) {
+                Log.i("POSTGET", e.message.toString())
                 _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
             }
         }
@@ -77,6 +78,9 @@ class ForumViewModel : ViewModel() {
                 val response = RetrofitClient.ApiServerForum.addPost(post)
                 if (response.isSuccessful) {
                     val postResponse = response.body()
+                    if (response.code() == 200) {
+                        _uiEvent.emit(UIEvent.Showsnackbar("Se creo el post con exito"))
+                    }
                 } else {
                     _uiEvent.emit(UIEvent.Showsnackbar("Error al agregar el post " + response.code()))
                 }

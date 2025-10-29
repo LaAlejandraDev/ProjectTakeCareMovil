@@ -95,8 +95,8 @@ fun CardHeader(postData: Post) {
 }
 
 @Composable
-fun CardBody(postData: Post, isExpanded: Boolean = false, forumViewModel: ForumViewModel = viewModel()) {
-    val commentsForPost = emptyList<Comment>()
+fun CardBody(postData: Post, isExpanded: Boolean = false) {
+    val commentsForPost = postData.comments
     val topComment = commentsForPost.maxByOrNull { it.likes }
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
