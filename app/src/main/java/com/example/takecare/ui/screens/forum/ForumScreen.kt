@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.takecare.data.models.Post
 import com.example.takecare.ui.navigation.HomeRoutes
 import com.example.takecare.ui.screens.forum.components.PostCard
 import com.example.takecare.ui.screens.forum.components.SearchBarComponent
@@ -25,10 +26,10 @@ import com.example.takecare.ui.screens.forum.components.SearchBarComponent
 fun ForumScreen(viewModel: ForumViewModel, navController: NavController) {
     var text by remember { mutableStateOf("") }
 
-    val posts = viewModel.posts.value
+    val posts = emptyList<Post>()
 
     val filteredPosts = posts.filter {
-        it!!.title.contains(text, ignoreCase = true)
+        it.title.contains(text, ignoreCase = true)
     }
 
 
@@ -58,7 +59,7 @@ fun ForumScreen(viewModel: ForumViewModel, navController: NavController) {
                 PostCard(
                     postData = item!!,
                     onViewClick = {
-                        viewModel.selectPost(item)
+                        //viewModel.selectPost(item)
                         navController.navigate(HomeRoutes.OpenPost.route)
                     }
                 )

@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.takecare.R
-import com.example.takecare.data.exampleData.sampleComments
+import com.example.takecare.data.models.Comment
 import com.example.takecare.data.models.Post
 
 @Composable
@@ -175,7 +175,7 @@ fun OpenPostAvatarHeader(openPost: Post?) {
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Avatar(initials = openPost!!.user.getInitials())
-                Text(openPost.user.userName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                Text(openPost.user.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
             }
             BadgeComponent(openPost!!.user.type.displayName, BadgeType.Primary)
         }
@@ -184,7 +184,7 @@ fun OpenPostAvatarHeader(openPost: Post?) {
 
 @Composable
 fun OpenPostComments(openPost: Post?, modifier: Modifier = Modifier) {
-    val comments = sampleComments.filter { it!!.postId == openPost!!.id }
+    val comments = emptyList<Comment>()
 
     Surface(
         shape = RoundedCornerShape(12.dp),
@@ -221,7 +221,7 @@ fun OpenPostComments(openPost: Post?, modifier: Modifier = Modifier) {
                     }
                 } else {
                     comments.forEach { item ->
-                        CommentComponent(item!!, onClick = {})
+                        CommentComponent(item, onClick = {})
                     }
                 }
             }

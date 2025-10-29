@@ -54,7 +54,7 @@ fun CommentComponent(
         }
         Column {
             Text(
-                text = comment.user.userName,
+                text = comment.user.name,
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onBackground
             )

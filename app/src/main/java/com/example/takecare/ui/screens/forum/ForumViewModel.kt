@@ -2,20 +2,26 @@ package com.example.takecare.ui.screens.forum
 
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.takecare.data.exampleData.sampleComments
-import com.example.takecare.data.exampleData.samplePosts
+import androidx.lifecycle.viewModelScope
+import com.example.takecare.data.client.RetrofitClient
 import com.example.takecare.data.models.Comment
 import com.example.takecare.data.models.Post
+import com.example.takecare.ui.Utils.UIEvent
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class ForumViewModel : ViewModel() {
-    private val _posts = mutableStateOf<List<Post?>>(emptyList())
-    val posts: State<List<Post?>> = _posts
+
+    private val _uiEvent = MutableSharedFlow<UIEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
+
+    private val _posts = MutableStateFlow<List<Post?>>(emptyList())
+    val posts: StateFlow<List<Post?>> = _posts
 
     private val _openPost = MutableStateFlow<Post?>(null)
     val openPost : StateFlow<Post?> = _openPost
@@ -26,55 +32,72 @@ class ForumViewModel : ViewModel() {
     private val _createdComment = MutableStateFlow<Comment?>(null)
     val createdComment : StateFlow<Comment?> = _createdComment
 
-    val comments = mutableStateListOf<Comment>()
+    private val _commentsList = MutableStateFlow<List<Comment?>>(emptyList())
+    val commentsList : StateFlow<List<Comment?>> = _commentsList
 
     init {
-        loadSamplePosts()
-        comments.addAll(sampleComments.filterNotNull())
+        getAllPost()
     }
 
-    fun incrementLikes(id: Int) {
-        val index = comments.indexOfFirst { it.id == id }
-        if (index != -1) {
-            val comment = comments[index]
-            comments[index] = comment.copy(likes = comment.likes + 1)
+    fun getAllPost() {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.ApiServerForum.getAllPost()
+                if (response.isSuccessful) {
+                    val postResponse = response.body() ?: emptyList()
+                    _posts.value = postResponse
+                } else {
+                    _uiEvent.emit(UIEvent.Showsnackbar("Error al obtener los post " + response.code()))
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
+            }
         }
     }
 
-    fun asignNewComment(comment: Comment) {
-        _createdComment.value = comment
-    }
-
-    fun createComment(comment: Comment) {
-        if (comment.comprobateComment()) {
-            _createdComment.value = comment
-            sampleComments.add(createdComment.value)
-            Log.i("FORUMPOST", "Se agrego un nuevo comentario")
-        } else {
-            Log.e("FORUMPOST", "Error al agregar un comentario")
+    fun openPostSelected(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.ApiServerForum.getAPost(id)
+                if (response.isSuccessful) {
+                    val postResponse = response.body()
+                    _openPost.value = postResponse
+                } else {
+                    _uiEvent.emit(UIEvent.Showsnackbar("Error al abrir el post " + response.code()))
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
+            }
         }
     }
 
-    fun asingNewPost(post: Post) {
-        _createdPost.value = post
-    }
-
-    fun createPost(post: Post) {
-        if (post.comprobatePost()) {
-            _createdPost.value = post
-            samplePosts.add(createdPost.value)
-            Log.i("FORUMPOST", "Se agrego un nuevo elemento")
-        } else {
-            Log.e("FORUMPOST", "Error al agregar el post")
+    fun addPost(post: Post) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.ApiServerForum.addPost(post)
+                if (response.isSuccessful) {
+                    val postResponse = response.body()
+                } else {
+                    _uiEvent.emit(UIEvent.Showsnackbar("Error al agregar el post " + response.code()))
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
+            }
         }
     }
 
-    fun selectPost(post: Post) {
-        Log.i("POSTCARD", post.id.toString())
-        _openPost.value = post
-    }
-
-    private fun loadSamplePosts() {
-        _posts.value = samplePosts
+    fun responsePost(id: Int, comment: Comment) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.ApiServerForum.responseAPost(id, comment)
+                if (response.isSuccessful) {
+                    val postResponse = response.body()
+                } else {
+                    _uiEvent.emit(UIEvent.Showsnackbar("Error al responder el post " + response.code()))
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
+            }
+        }
     }
 }

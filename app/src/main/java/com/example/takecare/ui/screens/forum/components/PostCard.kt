@@ -29,12 +29,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.takecare.data.exampleData.sampleComments
-import com.example.takecare.data.exampleData.sampleUsers
 import com.example.takecare.data.models.Comment
 import com.example.takecare.data.models.Post
 import com.example.takecare.ui.screens.forum.ForumViewModel
-import java.util.Date
 
 @Composable
 fun PostCard(
@@ -79,7 +76,7 @@ fun CardHeader(postData: Post) {
             Avatar(postData.user.getInitials())
             Column {
                 Text(
-                    postData.user.userName,
+                    postData.user.name,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
@@ -99,7 +96,7 @@ fun CardHeader(postData: Post) {
 
 @Composable
 fun CardBody(postData: Post, isExpanded: Boolean = false, forumViewModel: ForumViewModel = viewModel()) {
-    val commentsForPost = forumViewModel.comments.filter { it.postId == postData.id }
+    val commentsForPost = emptyList<Comment>()
     val topComment = commentsForPost.maxByOrNull { it.likes }
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -131,14 +128,13 @@ fun CardCommentBox(
 ) {
     var response by remember { mutableStateOf("") }
 
-    fun createNewComment() {
-        val newComment = Comment(
-            sampleComments.size + 1, postData.id, "2025-10-25", response,
-            sampleUsers[0], 0
-        )
-        forumViewModel.asignNewComment(comment = newComment)
-        forumViewModel.createComment(newComment)
-    }
+//    fun createNewComment() {
+//        val newComment = Comment(
+//            1, postData.id, "2025-10-25", response,
+//            1, null)
+//        forumViewModel.asignNewComment(comment = newComment)
+//        forumViewModel.createComment(newComment)
+//    }
 
     Row(
         modifier = modifier
@@ -163,7 +159,7 @@ fun CardCommentBox(
 
         Button(
             onClick = {
-                createNewComment()
+                //createNewComment()
             },
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -177,7 +173,7 @@ fun CardCommentBox(
 
 @Composable
 fun CardCommentSection(postData: Post, forumViewModel: ForumViewModel = viewModel()) {
-    val commentList = forumViewModel.comments.filter { it.postId == postData.id }
+    val commentList = emptyList<Comment>()
     Column (
         modifier = Modifier
             .fillMaxWidth()
