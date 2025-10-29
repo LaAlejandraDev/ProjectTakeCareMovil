@@ -20,16 +20,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.takecare.ui.Utils.SessionManager
 import com.example.takecare.ui.components.OutlinedTextFieldComponent
 import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.login.LoginViewModel
+import com.example.takecare.ui.screens.login.LoginViewModelFactory
 
 @Composable
-fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel = viewModel()) {
+fun LoginCard(navController: NavHostController) {
+
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager(context) }
+
+    val loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(sessionManager)
+    )
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

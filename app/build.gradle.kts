@@ -45,6 +45,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
     implementation("com.google.code.gson:gson:2.11.0")
 
     // Retrofit para peticiones HTTP
