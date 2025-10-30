@@ -94,7 +94,7 @@ fun OpenPostBody(openPost: Post?) {
     ) {
         Text("Creado " + openPost!!.date, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
         Text(openPost.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        BadgeComponent(openPost.type.displayName, BadgeType.Neutral)
+        BadgeComponent(openPost.type.toString(), BadgeType.Neutral)
         Text(
             openPost.content,
             style = MaterialTheme.typography.bodyMedium,
@@ -177,14 +177,14 @@ fun OpenPostAvatarHeader(openPost: Post?) {
                 Avatar(initials = openPost!!.user.getInitials())
                 Text(openPost.user.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
             }
-            BadgeComponent(openPost!!.user.type.displayName, BadgeType.Primary)
+            BadgeComponent(openPost!!.user.type.toString(), BadgeType.Primary)
         }
     }
 }
 
 @Composable
 fun OpenPostComments(openPost: Post?, modifier: Modifier = Modifier) {
-    val comments = openPost?.comments.orEmpty()
+    val comments = emptyList<Comment>()
 
     Surface(
         shape = RoundedCornerShape(12.dp),

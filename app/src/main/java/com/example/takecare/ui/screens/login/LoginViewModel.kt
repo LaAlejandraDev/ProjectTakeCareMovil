@@ -1,6 +1,7 @@
 package com.example.takecare.ui.screens.login
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -26,7 +27,7 @@ class LoginViewModel(
 
                     sessionManager.saveSession(
                         token = response.body()?.token ?: "",
-                        userId = response.body()?.user?.id.toString(),
+                        userId = response.body()?.user?.id ?: -1,
                         userName = response.body()?.user?.name ?: "",
                         email = response.body()?.user?.email ?: ""
                     )
@@ -40,5 +41,26 @@ class LoginViewModel(
             }
         }
     }
+
+    fun verifUserLogged(context: Context) {
+        viewModelScope.launch {
+            val sessionManager = SessionManager(context)
+
+            sessionManager.getToken().collect { token ->
+                if (!token.isNullOrEmpty()) {
+                    try {
+                        val response = RetrofitClient.ApiLoginUsers.verifyToken(mapOf("token" to token))
+                        Log.i("TOKEN", "TOKEN: ${sessionManager.getToken()}")
+                        _loginSuccess.value = response.isSuccessful
+                    } catch (e: Exception) {
+                        _loginSuccess.value = false
+                    }
+                } else {
+                    _loginSuccess.value = false
+                }
+            }
+        }
+    }
+
 }
 

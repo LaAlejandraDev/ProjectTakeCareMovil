@@ -27,6 +27,5 @@ fun HomeScreen() {
         composable(HomeRoutes.OpenPost.route) {
             ForumDetailsPost(forumViewModel, rootNavController)
         }
-
     }
 }

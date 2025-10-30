@@ -39,6 +39,8 @@ fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel =
     val loginSuccess by loginViewModel.loginSuccess
 
     LaunchedEffect(loginSuccess) {
+        loginViewModel.verifUserLogged(context)
+
         if (loginSuccess) {
             navController.navigate(Routes.Home.route) {
                 popUpTo(Routes.Login.route) { inclusive = true }

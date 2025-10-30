@@ -10,7 +10,7 @@ class UserRepository(private val apiUsers: ApiUsers) {
         return apiUsers.getAllUsers()
     }
 
-    suspend fun getUser(id: Int): Response<List<User>> {
+    suspend fun getUser(id: Int): Response<User> {
         return apiUsers.getUser(id)
     }
 

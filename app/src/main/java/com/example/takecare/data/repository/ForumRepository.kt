@@ -2,6 +2,7 @@ package com.example.takecare.data.repository
 
 import com.example.takecare.data.interfaces.ApiForum
 import com.example.takecare.data.models.Comment
+import com.example.takecare.data.models.Insert.PostModelCreate
 import com.example.takecare.data.models.Post
 import retrofit2.Response
 
@@ -10,13 +11,13 @@ class ForumRepository(private val apiService: ApiForum) {
         return apiService.getAllPost()
     }
 
-    suspend fun getAPost(id: Int): Response<List<Post>> {
+    suspend fun getAPost(id: Int): Response<Post> {
         return apiService.getAPost(id)
     }
 
-    suspend fun addPost(post: Post): Boolean {
+    suspend fun addPost(post: PostModelCreate): Post {
         val response = apiService.addPost(post)
-        return response.isSuccessful
+        return response.body()!!
     }
 
     suspend fun likeAPost(id: Int): Boolean {

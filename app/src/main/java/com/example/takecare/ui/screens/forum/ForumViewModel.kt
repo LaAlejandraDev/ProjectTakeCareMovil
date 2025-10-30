@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
 import com.example.takecare.data.models.Comment
+import com.example.takecare.data.models.Insert.PostModelCreate
 import com.example.takecare.data.models.Post
 import com.example.takecare.ui.Utils.SessionManager
 import com.example.takecare.ui.Utils.UIEvent
@@ -61,7 +62,7 @@ class ForumViewModel : ViewModel() {
                 val response = RetrofitClient.ApiServerForum.getAPost(id)
                 if (response.isSuccessful) {
                     Log.i("POSTGET", response.body().toString())
-                    val postResponse = response.body()?.firstOrNull()
+                    val postResponse = response.body()
                     _openPost.value = postResponse
                 } else {
                     Log.e("POSTGET", response.body().toString())
@@ -74,21 +75,27 @@ class ForumViewModel : ViewModel() {
         }
     }
 
-    fun addPost(post: Post, context: Context) {
-        val sessionManager = SessionManager(context)
+    fun addPost(post: PostModelCreate) {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerForum.addPost(post)
                 if (response.isSuccessful) {
-                    val postResponse = response.body()
-                    if (response.code() == 200) {
-                        _uiEvent.emit(UIEvent.Showsnackbar("Se creo el post con exito"))
-                    }
+                    Log.i(
+                        "POSTCREATION",
+                        "Código: ${response.code()} | Cuerpo: ${response.body()} | Mensaje: ${response.message()}"
+                    )
+                    _uiEvent.emit(UIEvent.Showsnackbar("Se creó el post con éxito"))
                 } else {
-                    _uiEvent.emit(UIEvent.Showsnackbar("Error al agregar el post " + response.code()))
+                    val errorBody = response.errorBody()?.string()
+                    Log.e(
+                        "POSTCREATION_ERROR",
+                        "Error ${response.code()} | Mensaje: ${response.message()} | Cuerpo de error: $errorBody"
+                    )
+                    _uiEvent.emit(UIEvent.Showsnackbar("Error al agregar el post: ${response.code()}"))
                 }
             } catch (e: Exception) {
-                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
+                Log.e("POSTCREATION_EXCEPTION", "Excepción: ${e.message}", e)
+                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor: ${e.message}"))
             }
         }
     }

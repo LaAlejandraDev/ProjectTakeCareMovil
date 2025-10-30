@@ -80,7 +80,7 @@ fun CardHeader(postData: Post) {
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
-                    postData.date,
+                    postData.date.take(10),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )
@@ -88,15 +88,15 @@ fun CardHeader(postData: Post) {
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            BadgeComponent(postData.type.displayName, BadgeType.Success)
-            BadgeComponent(postData.user.type.displayName, BadgeType.Primary)
+            BadgeComponent(postData.getPostTypeText(), BadgeType.Success)
+            BadgeComponent(postData.user.getUserType(), BadgeType.Primary)
         }
     }
 }
 
 @Composable
 fun CardBody(postData: Post, isExpanded: Boolean = false) {
-    val commentsForPost = postData.comments
+    val commentsForPost = emptyList<Comment>()
     val topComment = commentsForPost.maxByOrNull { it.likes }
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {

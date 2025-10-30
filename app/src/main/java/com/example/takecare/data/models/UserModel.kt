@@ -3,36 +3,60 @@ package com.example.takecare.data.models
 import com.google.gson.annotations.SerializedName
 
 data class User(
-    @SerializedName("Id")
+    @SerializedName("id")
     val id: Int? = null,
-    @SerializedName("Nombre")
+
+    @SerializedName("nombre")
     val name: String,
-    @SerializedName("ApellidoPaterno")
+
+    @SerializedName("apellidoPaterno")
     val firstLastName: String,
-    @SerializedName("ApellidoMaterno")
+
+    @SerializedName("apellidoMaterno")
     val secondLastName: String,
-    @SerializedName("Correo")
+
+    @SerializedName("correo")
     val email: String,
-    @SerializedName("Telefono")
+
+    @SerializedName("telefono")
     val phone: String,
-    @SerializedName("Country")
+
+    @SerializedName("country")
     val country: String? = null,
-    @SerializedName("Contrasena")
+
+    @SerializedName("contrasena")
     val password: String,
+
     @SerializedName("imagen")
     val imageUrl: String? = null,
-    @SerializedName("Rol")
-    val type: UserType,
-    @SerializedName("Activo")
+
+    @SerializedName("rol")
+    val type: Int,
+
+    @SerializedName("activo")
     val isActive: Boolean? = null,
-    @SerializedName("FechaRegistro")
+
+    @SerializedName("fechaRegistro")
     val createdAt: String? = null,
-    @SerializedName("UltimoAcceso")
-    val lastAccess: String? = null,
+
+    @SerializedName("ultimoAcceso")
+    val lastAccess: String? = null
 ) {
     fun getInitials(): String {
         return name.take(1).uppercase();
     }
+
+    fun getUserType(): String {
+        val index = type - 1
+
+        return when (index) {
+            0 -> UserType.PATIENT.displayName
+            1 -> UserType.PSICOLOGIST.displayName
+            2 -> UserType.ADMIN.displayName
+            else -> "Desconocido"
+        }
+    }
+
 }
 
 enum class UserType(val displayName: String) {
