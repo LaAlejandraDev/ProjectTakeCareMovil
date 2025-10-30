@@ -6,6 +6,7 @@ sealed class Routes(val route: String, string: String, icMenuSend: Int) {
     object Login : Routes("login", "Inicio", android.R.drawable.ic_menu_send)
     object Register : Routes("register", "Inicio", android.R.drawable.ic_menu_send)
     object Home : Routes("home", "Inicio", android.R.drawable.ic_menu_send)
+    object Loading : Routes("loading", "Cargando", android.R.drawable.ic_menu_send)
 }
 
 sealed class HomeRoutes(val route: String, val label: String, val icon: Int) {

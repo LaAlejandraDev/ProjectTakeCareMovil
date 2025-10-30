@@ -12,12 +12,12 @@ import androidx.navigation.NavHostController
 import com.example.takecare.ui.screens.login.components.LoginCard
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel) {
     Column (
         modifier = Modifier.fillMaxSize().padding(12.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LoginCard(navController)
+        LoginCard(navController, loginViewModel)
     }
 }

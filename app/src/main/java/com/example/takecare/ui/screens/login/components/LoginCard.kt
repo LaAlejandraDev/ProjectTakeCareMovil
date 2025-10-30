@@ -30,19 +30,18 @@ import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.login.LoginViewModel
 
 @Composable
-fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel = viewModel()) {
+fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val loginSuccess by loginViewModel.loginSuccess
 
     val context = LocalContext.current
 
-    val loginSuccess by loginViewModel.loginSuccess
-
     LaunchedEffect(loginSuccess) {
-        loginViewModel.verifUserLogged(context)
+        loginViewModel.verifyUserLogged(context)
 
         if (loginSuccess) {
-            navController.navigate(Routes.Home.route) {
+            navController.navigate(Routes.Loading.route) {
                 popUpTo(Routes.Login.route) { inclusive = true }
             }
         }
