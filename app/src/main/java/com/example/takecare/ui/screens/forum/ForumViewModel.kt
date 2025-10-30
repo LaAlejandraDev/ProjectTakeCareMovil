@@ -1,5 +1,6 @@
 package com.example.takecare.ui.screens.forum
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
 import com.example.takecare.data.models.Comment
 import com.example.takecare.data.models.Post
+import com.example.takecare.ui.Utils.SessionManager
 import com.example.takecare.ui.Utils.UIEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,7 +74,8 @@ class ForumViewModel : ViewModel() {
         }
     }
 
-    fun addPost(post: Post) {
+    fun addPost(post: Post, context: Context) {
+        val sessionManager = SessionManager(context)
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerForum.addPost(post)

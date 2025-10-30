@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -29,20 +28,13 @@ import com.example.takecare.ui.Utils.SessionManager
 import com.example.takecare.ui.components.OutlinedTextFieldComponent
 import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.login.LoginViewModel
-import com.example.takecare.ui.screens.login.LoginViewModelFactory
 
 @Composable
-fun LoginCard(navController: NavHostController) {
-
-    val context = LocalContext.current
-    val sessionManager = remember { SessionManager(context) }
-
-    val loginViewModel: LoginViewModel = viewModel(
-        factory = LoginViewModelFactory(sessionManager)
-    )
-
+fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
 
     val loginSuccess by loginViewModel.loginSuccess
 
@@ -90,7 +82,7 @@ fun LoginCard(navController: NavHostController) {
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    loginViewModel.loginUser(email, password)
+                    loginViewModel.loginUser(email, password, context)
                 }
             ) {
                 Text("Iniciar Sesion")

@@ -8,35 +8,28 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 val Context.dataStore by preferencesDataStore("user_session")
+class SessionManager(private val context: Context) {
 
-class SessionManager (private val context: Context) {
     companion object {
-        private val TOKEN_KEY = stringPreferencesKey("token")
-        private val USER_ID_KEY = intPreferencesKey("user_id")
-        private val NAME_KEY = stringPreferencesKey("name")
-        private val EMAIL_KEY = stringPreferencesKey("email")
-        private val ROLE_KEY = intPreferencesKey("role")
+        private val KEY_TOKEN = stringPreferencesKey("token")
+        private val KEY_USER_ID = stringPreferencesKey("userId")
+        private val KEY_NAME = stringPreferencesKey("userName")
+        private val KEY_EMAIL = stringPreferencesKey("email")
     }
 
-    suspend fun saveSession(user: UserSession) {
-        context.dataStore.edit { preferences ->
-            preferences[TOKEN_KEY] = user.token
-            preferences[USER_ID_KEY] = user.userId
-            preferences[NAME_KEY] = user.userName
-            preferences[EMAIL_KEY] = user.email
-            preferences[ROLE_KEY] = user.role
+    suspend fun saveSession(token: String, userId: String, userName: String, email: String) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_TOKEN] = token
+            prefs[KEY_USER_ID] = userId
+            prefs[KEY_NAME] = userName
+            prefs[KEY_EMAIL] = email
         }
     }
 
-    fun getSession(): Flow<UserSession> = context.dataStore.data.map { prefs ->
-        UserSession(
-            token = prefs[TOKEN_KEY] ?: "",
-            userId = prefs[USER_ID_KEY] ?: -1,
-            userName = prefs[NAME_KEY] ?: "",
-            email = prefs[EMAIL_KEY] ?: "",
-            role = prefs[ROLE_KEY] ?: 0
-        )
-    }
+    fun getToken(): Flow<String?> = context.dataStore.data.map { it[KEY_TOKEN] }
+    fun getUserId(): Flow<String?> = context.dataStore.data.map { it[KEY_USER_ID] }
+    fun getUserName(): Flow<String?> = context.dataStore.data.map { it[KEY_NAME] }
+    fun getEmail(): Flow<String?> = context.dataStore.data.map { it[KEY_EMAIL] }
 
     suspend fun clearSession() {
         context.dataStore.edit { it.clear() }
