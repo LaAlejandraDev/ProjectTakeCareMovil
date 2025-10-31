@@ -21,14 +21,8 @@ data class User(
     @SerializedName("telefono")
     val phone: String,
 
-    @SerializedName("country")
-    val country: String? = null,
-
     @SerializedName("contrasena")
     val password: String,
-
-    @SerializedName("imagen")
-    val imageUrl: String? = null,
 
     @SerializedName("rol")
     val type: Int,

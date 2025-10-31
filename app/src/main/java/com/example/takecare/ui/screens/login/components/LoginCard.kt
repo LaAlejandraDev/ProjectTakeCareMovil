@@ -28,6 +28,7 @@ import com.example.takecare.ui.Utils.SessionManager
 import com.example.takecare.ui.components.OutlinedTextFieldComponent
 import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.login.LoginViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel, onLoaderFunction: () -> Unit) {
@@ -39,7 +40,6 @@ fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel, 
 
     LaunchedEffect(loginSuccess) {
         loginViewModel.verifyUserLogged(context)
-
         if (loginSuccess) {
             navController.navigate(Routes.Loading.route) {
                 popUpTo(Routes.Login.route) { inclusive = true }

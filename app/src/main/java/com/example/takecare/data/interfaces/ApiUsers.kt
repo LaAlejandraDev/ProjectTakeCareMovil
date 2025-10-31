@@ -1,5 +1,6 @@
 package com.example.takecare.data.interfaces
 
+import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.RegisterUserModel
 import com.example.takecare.data.models.User
 import retrofit2.Response
@@ -16,6 +17,6 @@ interface ApiUsers {
     @GET("Usuarios/{id}")
     suspend fun getUser(@Path("id") id: Int): Response<User>
 
-    @POST("Usuarios")
-    suspend fun addUser(@Body user: RegisterUserModel): Response<RegisterUserModel>
+    @POST("Pacientes")
+    suspend fun addUser(@Body user: PatientModel): Response<PatientModel>
 }
