@@ -1,5 +1,6 @@
 package com.example.takecare.ui.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +22,18 @@ fun AppNavGraph(navController: NavHostController, loginViewModel: LoginViewModel
     val isLoginWaiting = loginViewModel.isVerifyingSession.collectAsState().value
     val loginSuccess by loginViewModel.loginSuccess
 
+    val loaderFunction: () -> Unit = {
+        if (loginSuccess) {
+            navController.navigate(Routes.Home.route) {
+                popUpTo(0)
+            }
+        } else {
+            navController.navigate(Routes.Login.route) {
+                popUpTo(0)
+            }
+        }
+    }
+
     LaunchedEffect(loginSuccess) {
         loginViewModel.verifyUserLogged(context)
     }
@@ -31,12 +44,14 @@ fun AppNavGraph(navController: NavHostController, loginViewModel: LoginViewModel
         else -> Routes.Login.route
     }
 
+    Log.i("NAV", startDestination)
+
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
         composable(Routes.Login.route) {
-            LoginScreen(navController, loginViewModel)
+            LoginScreen(navController, loginViewModel, loaderFunction)
         }
         composable(Routes.Register.route) {
             RegisterScreen(navController)
@@ -48,15 +63,7 @@ fun AppNavGraph(navController: NavHostController, loginViewModel: LoginViewModel
             LoadingScreen(
                 message = "Iniciando...",
                 onLoadingHandler = {
-                    if (loginSuccess) {
-                        navController.navigate(Routes.Home.route) {
-                            popUpTo(0)
-                        }
-                    } else {
-                        navController.navigate(Routes.Login.route) {
-                            popUpTo(0)
-                        }
-                    }
+                    loaderFunction()
                 }
             )
         }

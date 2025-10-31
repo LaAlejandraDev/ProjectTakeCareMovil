@@ -31,7 +31,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun LoadingScreen(
     message: String = "Cargando...",
-    onLoadingHandler: (() -> Unit)? = null,
+    onLoadingHandler: suspend () -> Unit,
     durationMillis: Long = 1500,
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -39,7 +39,7 @@ fun LoadingScreen(
     LaunchedEffect(Unit) {
         visible = true
         delay(durationMillis)
-        onLoadingHandler?.invoke()
+        onLoadingHandler.invoke()
     }
 
     Surface(

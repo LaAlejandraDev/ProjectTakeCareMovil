@@ -19,7 +19,7 @@ class LoginViewModel : ViewModel() {
     private val _loginSuccess = mutableStateOf(false)
     val loginSuccess: State<Boolean> = _loginSuccess
 
-    private val _isVerifyingSession = MutableStateFlow(true)
+    private val _isVerifyingSession = MutableStateFlow(false)
     val isVerifyingSession: StateFlow<Boolean> = _isVerifyingSession
 
     fun loginUser(email: String, password: String, context: Context) {
@@ -48,13 +48,12 @@ class LoginViewModel : ViewModel() {
 
     fun verifyUserLogged(context: Context) {
         viewModelScope.launch {
-            _isVerifyingSession.value = true
             val sessionManager = SessionManager(context)
-
             val token = sessionManager.getToken().firstOrNull()
-
+            Log.i("Token", token?.isEmpty().toString())
             if (!token.isNullOrEmpty()) {
                 try {
+                    _isVerifyingSession.value = true
                     val response = RetrofitClient.ApiLoginUsers.verifyToken(mapOf("token" to token))
                     if (response.isSuccessful) {
                         Log.e("LOGIN_TOKEN", token)
@@ -71,6 +70,7 @@ class LoginViewModel : ViewModel() {
                 }
             } else {
                 _loginSuccess.value = false
+                _isVerifyingSession.value = false
             }
 
             _isVerifyingSession.value = false

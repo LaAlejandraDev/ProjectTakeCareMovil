@@ -30,7 +30,7 @@ import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.login.LoginViewModel
 
 @Composable
-fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel) {
+fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel, onLoaderFunction: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginSuccess by loginViewModel.loginSuccess
