@@ -30,57 +30,42 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun LoadingScreen(
-    message: String = "Cargando...",
-    onLoadingHandler: suspend () -> Unit,
-    durationMillis: Long = 1500,
+    message: String
 ) {
-    var visible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        visible = true
-        delay(durationMillis)
-        onLoadingHandler.invoke()
-    }
-
     Surface(
         modifier = Modifier
             .fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        AnimatedVisibility(
-            visible = visible,
-            enter = fadeIn(animationSpec = tween(durationMillis = 1000))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "App logo",
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "App logo",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(bottom = 20.dp)
-                )
+                    .size(80.dp)
+                    .padding(bottom = 20.dp)
+            )
 
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+            Text(
+                text = message,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground
                 )
+            )
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                CircularProgressIndicator(
-                    modifier = Modifier.size(32.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            CircularProgressIndicator(
+                modifier = Modifier.size(32.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

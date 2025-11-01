@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
 import com.example.takecare.data.models.LoginRequest
 import com.example.takecare.ui.Utils.SessionManager
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -30,11 +31,12 @@ class LoginViewModel : ViewModel() {
                 if (response.isSuccessful && response.body() != null) {
                     val body = response.body()!!
                     sessionManager.saveSession(
-                        token = body.token ?: "",
-                        userId = body.user?.id ?: -1,
-                        userName = body.user?.name ?: "",
-                        email = body.user?.email ?: ""
+                        token = body.token,
+                        userId = body.user.id,
+                        userName = body.user.name,
+                        email = body.user.email
                     )
+                    Log.i("TOKENGUARDADO", body.token)
                     _loginSuccess.value = true
                 } else {
                     _loginSuccess.value = false
@@ -49,30 +51,33 @@ class LoginViewModel : ViewModel() {
     fun verifyUserLogged(context: Context) {
         viewModelScope.launch {
             val sessionManager = SessionManager(context)
+            _isVerifyingSession.value = true
+
             val token = sessionManager.getToken().firstOrNull()
-            Log.i("Token", token?.isEmpty().toString())
+
             if (!token.isNullOrEmpty()) {
+                Log.i("TokenLogin", "Sí hay token: $token")
                 try {
-                    _isVerifyingSession.value = true
                     val response = RetrofitClient.ApiLoginUsers.verifyToken(mapOf("token" to token))
                     if (response.isSuccessful) {
-                        Log.e("LOGIN_TOKEN", token)
-                        Log.e("SERVER_RESPONSE", response.message())
+                        Log.i("TokenLogin", "Token válido")
                         _loginSuccess.value = true
                     } else {
+                        Log.w("TokenLogin", "Token inválido, limpiando sesión")
                         sessionManager.clearSession()
                         _loginSuccess.value = false
                     }
                 } catch (e: Exception) {
-                    Log.e("VERIFY_ERROR", e.message.toString())
+                    Log.e("TokenLogin", "Error verificando token: ${e.message}")
                     sessionManager.clearSession()
                     _loginSuccess.value = false
                 }
             } else {
+                Log.i("TokenLogin", "No hay token guardado")
                 _loginSuccess.value = false
-                _isVerifyingSession.value = false
             }
 
+            delay(1000)
             _isVerifyingSession.value = false
         }
     }

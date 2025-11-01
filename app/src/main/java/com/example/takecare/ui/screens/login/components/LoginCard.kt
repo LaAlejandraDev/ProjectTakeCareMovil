@@ -31,21 +31,12 @@ import com.example.takecare.ui.screens.login.LoginViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel, onLoaderFunction: () -> Unit) {
+fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginSuccess by loginViewModel.loginSuccess
 
     val context = LocalContext.current
-
-    LaunchedEffect(loginSuccess) {
-        loginViewModel.verifyUserLogged(context)
-        if (loginSuccess) {
-            navController.navigate(Routes.Loading.route) {
-                popUpTo(Routes.Login.route) { inclusive = true }
-            }
-        }
-    }
 
     OutlinedCard (
         modifier = Modifier
@@ -84,6 +75,7 @@ fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel, 
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     loginViewModel.loginUser(email, password, context)
+                    if (loginSuccess) navController.navigate(Routes.Home.route)
                 }
             ) {
                 Text("Iniciar Sesion")

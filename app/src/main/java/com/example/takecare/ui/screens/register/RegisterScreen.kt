@@ -66,7 +66,7 @@ fun RegisterScreen(
     )
 
     fun createNewUser() {
-        val newUser: User = User(
+        val newUser = User(
             name = name,
             firstLastName = firstLastName,
             secondLastName = secondLastName,
@@ -76,7 +76,7 @@ fun RegisterScreen(
             type = 0,
         )
 
-        val newPatient: PatientModel = PatientModel(
+        val newPatient = PatientModel(
             city = city,
             martialStatus = martialStatus,
             diagnostic = diagnostic,
@@ -85,7 +85,8 @@ fun RegisterScreen(
             emergencyContact = emergencyContact,
             user = newUser,
             id = 0,
-            userId = 0
+            userId = 0,
+            bornDate = bornDate
         )
 
         registerViewModel.createNewUser(newPatient)
@@ -131,6 +132,7 @@ fun RegisterScreen(
                             if (currentStep < totalSteps - 1) {
                                 currentStep++
                             } else {
+                                navController.navigate(Routes.Loading.route)
                                 createNewUser()
                             }
                         }
