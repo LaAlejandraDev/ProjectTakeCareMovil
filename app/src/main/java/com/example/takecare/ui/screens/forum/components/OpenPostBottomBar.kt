@@ -34,10 +34,10 @@ import com.example.takecare.R
 
 @Composable
 fun OpenPostBottomBar(
-    onSendClick: (String) -> Unit = {}
+    onSendClick: () -> Unit,
+    onContentChange: (String) -> Unit,
+    commentText: String,
 ) {
-    var commentText by remember { mutableStateOf("") }
-
     Surface(
         modifier = Modifier
             .fillMaxWidth(),
@@ -54,7 +54,7 @@ fun OpenPostBottomBar(
         ) {
             OutlinedTextField(
                 value = commentText,
-                onValueChange = { commentText = it },
+                onValueChange = onContentChange,
                 placeholder = { Text("Escribe un comentario...") },
                 modifier = Modifier
                     .weight(1f)
@@ -79,8 +79,7 @@ fun OpenPostBottomBar(
             IconButton(
                 onClick = {
                     if (commentText.isNotBlank()) {
-                        onSendClick(commentText)
-                        commentText = ""
+                        onSendClick()
                     }
                 },
                 modifier = Modifier

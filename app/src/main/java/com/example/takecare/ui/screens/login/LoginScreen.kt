@@ -21,16 +21,11 @@ import kotlinx.coroutines.delay
 @Composable
 fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel) {
     val context = LocalContext.current
-    val isLoginWaiting = loginViewModel.isVerifyingSession.collectAsState().value
     val loginSuccess by loginViewModel.loginSuccess
 
     val loaderFunction: () -> Unit = {
         if (loginSuccess) {
             navController.navigate(Routes.Home.route) {
-                popUpTo(0)
-            }
-        } else {
-            navController.navigate(Routes.Login.route) {
                 popUpTo(0)
             }
         }
@@ -40,11 +35,9 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
         loginViewModel.verifyUserLogged(context)
     }
 
-    LaunchedEffect(isLoginWaiting) {
-        if (!isLoginWaiting) {
-            loaderFunction()
-        }
-    }
+    LaunchedEffect(loginSuccess) {
+        loaderFunction()
+    }   
 
     Column(
         modifier = Modifier
@@ -53,9 +46,9 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isLoginWaiting) {
+        if (loginSuccess) {
             LoadingScreen("Iniciando...")
-        } else if (!loginSuccess ){
+        } else {
             LoginCard(navController, loginViewModel)
         }
     }

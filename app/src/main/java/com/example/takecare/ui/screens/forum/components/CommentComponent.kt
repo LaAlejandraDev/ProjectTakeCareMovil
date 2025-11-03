@@ -49,20 +49,24 @@ fun CommentComponent(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Avatar(comment.user.getInitials(), size = 24.dp)
+            Avatar(comment.user!!.getInitials(), size = 24.dp)
             Text(comment.likes.toString(), style = MaterialTheme.typography.bodySmall)
         }
         Column {
-            Text(
-                text = comment.user.name,
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                text = comment.content,
-                style = MaterialTheme.typography.bodySmall,
-                color = if (isTop) MaterialTheme.colorScheme.primary else Color.Gray
-            )
+            comment.user?.name?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+            comment.content?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isTop) MaterialTheme.colorScheme.primary else Color.Gray
+                )
+            }
         }
     }
 }

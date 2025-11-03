@@ -132,7 +132,6 @@ fun RegisterScreen(
                             if (currentStep < totalSteps - 1) {
                                 currentStep++
                             } else {
-                                navController.navigate(Routes.Loading.route)
                                 createNewUser()
                             }
                         }

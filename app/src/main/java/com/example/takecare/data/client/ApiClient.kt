@@ -1,5 +1,6 @@
 package com.example.takecare.data.client
 
+import com.example.takecare.data.interfaces.ApiComments
 import com.example.takecare.data.interfaces.ApiForum
 import com.example.takecare.data.interfaces.ApiLogin
 import com.example.takecare.data.interfaces.ApiUsers
@@ -31,5 +32,13 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiLogin::class.java)
+    }
+
+    val ApiServerComments: ApiComments by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiComments::class.java)
     }
 }

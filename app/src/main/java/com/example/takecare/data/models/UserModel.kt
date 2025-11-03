@@ -7,25 +7,25 @@ data class User(
     val id: Int? = null,
 
     @SerializedName("nombre")
-    val name: String,
+    val name: String? = null,
 
     @SerializedName("apellidoPaterno")
-    val firstLastName: String,
+    val firstLastName: String? = null,
 
     @SerializedName("apellidoMaterno")
-    val secondLastName: String,
+    val secondLastName: String? = null,
 
     @SerializedName("correo")
-    val email: String,
+    val email: String? = null,
 
     @SerializedName("telefono")
-    val phone: String,
+    val phone: String? = null,
 
     @SerializedName("contrasena")
-    val password: String,
+    val password: String? = null,
 
     @SerializedName("rol")
-    val type: Int,
+    val type: Int? = null,
 
     @SerializedName("activo")
     val isActive: Boolean? = null,
@@ -37,11 +37,11 @@ data class User(
     val lastAccess: String? = null
 ) {
     fun getInitials(): String {
-        return name.take(1).uppercase();
+        return name!!.take(1).uppercase();
     }
 
     fun getUserType(): String {
-        val index = type - 1
+        val index = type
 
         return when (index) {
             0 -> UserType.PATIENT.displayName

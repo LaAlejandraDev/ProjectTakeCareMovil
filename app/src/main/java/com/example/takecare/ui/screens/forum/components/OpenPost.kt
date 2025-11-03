@@ -42,9 +42,9 @@ import com.example.takecare.data.models.Post
 @Composable
 fun OpenPost(
     modifier: Modifier = Modifier,
-    content : @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
-    Column (
+    Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -57,15 +57,13 @@ fun OpenPostHeader(
     modifier: Modifier = Modifier,
     rootNavController: NavController
 ) {
-    Row (
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 25.dp)
     ) {
         IconButton(
-            onClick = {
-                rootNavController.navigate("main_scaffold")
-            },
+            onClick = { rootNavController.navigate("main_scaffold") },
             modifier = Modifier
                 .size(48.dp)
                 .background(Color.White, CircleShape)
@@ -87,16 +85,28 @@ fun OpenPostHeader(
 
 @Composable
 fun OpenPostBody(openPost: Post?) {
-    Column (
-        modifier = Modifier
-            .fillMaxWidth(),
+    if (openPost == null) {
+        Text("Post no disponible", style = MaterialTheme.typography.bodyMedium)
+        return
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Creado " + openPost!!.date, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-        Text(openPost.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        BadgeComponent(openPost.type.toString(), BadgeType.Neutral)
         Text(
-            openPost.content,
+            text = "Creado " + (openPost.date ?: "desconocido"),
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+        Text(
+            text = openPost.title ?: "Sin título",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        BadgeComponent(openPost.getPostTypeText(openPost.type) ?: "Desconocido", BadgeType.Neutral)
+        Text(
+            text = openPost.content ?: "",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Justify,
             color = Color.Gray
@@ -105,12 +115,15 @@ fun OpenPostBody(openPost: Post?) {
 }
 
 @Composable
-fun OpenPostActions(openPost: Post?) {
-    Row (
+fun OpenPostActions(openPost: Post?, commentsCount: Int) {
+    val likes = openPost?.likesCount ?: 0
+    val comments = commentsCount ?: 0
+
+    Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
-    ){
+    ) {
         Button(
             onClick = { /* TODO: Acción de "Me gusta" */ },
             shape = RoundedCornerShape(50),
@@ -128,17 +141,17 @@ fun OpenPostActions(openPost: Post?) {
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = openPost?.likesCount.toString(),
+                text = likes.toString(),
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium)
             )
         }
 
-        BadgeIconComponent (
+        BadgeIconComponent(
             type = BadgeType.Neutral,
             horizontalPadding = 16.dp,
             verticalPadding = 10.dp
-        ){
-            Row (horizontalArrangement = Arrangement.spacedBy(8.dp)){
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(
                     painterResource(R.drawable.message),
                     contentDescription = "Comentarios",
@@ -146,45 +159,47 @@ fun OpenPostActions(openPost: Post?) {
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = openPost?.commentCount.toString(),
+                    text = comments.toString(),
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium)
                 )
             }
         }
-
     }
 }
 
 @Composable
 fun OpenPostAvatarHeader(openPost: Post?) {
+    val user = openPost?.user
     Surface(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         color = Color.White,
         tonalElevation = 2.dp,
         shadowElevation = 2.dp
     ) {
-        Row (
+        Row(
             modifier = Modifier.padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-        ){
-            Row (
+        ) {
+            Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
-            ){
-                Avatar(initials = openPost!!.user.getInitials())
-                Text(openPost.user.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            ) {
+                Avatar(initials = user?.getInitials() ?: "")
+                Text(
+                    text = user?.name ?: "Usuario desconocido",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            BadgeComponent(openPost!!.user.type.toString(), BadgeType.Primary)
+            BadgeComponent(user?.getUserType() ?: "Desconocido", BadgeType.Primary)
         }
     }
 }
 
 @Composable
-fun OpenPostComments(openPost: Post?, modifier: Modifier = Modifier) {
-    val comments = emptyList<Comment>()
+fun OpenPostComments(postComments: List<Comment?>, modifier: Modifier = Modifier) {
 
     Surface(
         shape = RoundedCornerShape(12.dp),
@@ -203,12 +218,13 @@ fun OpenPostComments(openPost: Post?, modifier: Modifier = Modifier) {
             )
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (comments.isEmpty()) {
+                val safeComments = postComments.filterNotNull() // elimina nulos
+
+                if (safeComments.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -220,7 +236,7 @@ fun OpenPostComments(openPost: Post?, modifier: Modifier = Modifier) {
                         )
                     }
                 } else {
-                    comments.forEach { item ->
+                    safeComments.forEach { item ->
                         CommentComponent(item, onClick = {})
                     }
                 }

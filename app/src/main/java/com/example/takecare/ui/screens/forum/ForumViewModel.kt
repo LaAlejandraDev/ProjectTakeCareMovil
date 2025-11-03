@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
 import com.example.takecare.data.models.Comment
+import com.example.takecare.data.models.CreateComment
 import com.example.takecare.data.models.Insert.PostModelCreate
 import com.example.takecare.data.models.Post
 import com.example.takecare.ui.Utils.SessionManager
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class ForumViewModel : ViewModel() {
@@ -35,8 +37,28 @@ class ForumViewModel : ViewModel() {
     private val _createdComment = MutableStateFlow<Comment?>(null)
     val createdComment : StateFlow<Comment?> = _createdComment
 
+    private val _postCommentsList = MutableStateFlow<List<Comment?>>(emptyList())
+    val postCommentList : StateFlow<List<Comment?>> = _postCommentsList
+
+    private val _userId = MutableStateFlow(-1)
+    val userId : StateFlow<Int> = _userId
+
     init {
         getAllPost()
+    }
+
+    fun getUserId(context: Context) {
+        viewModelScope.launch {
+            try {
+                val sessionManager = SessionManager(context)
+                val userId = sessionManager.getUserId().firstOrNull()
+                if (userId != null) {
+                    _userId.value = userId
+                }
+            } catch (e: Exception) {
+                Log.i("TokenGuardado", "Error al obtener el id del usuario: $e")
+            }
+        }
     }
 
     fun getAllPost() {
@@ -100,17 +122,68 @@ class ForumViewModel : ViewModel() {
         }
     }
 
-    fun responsePost(id: Int, comment: Comment) {
+    fun getPostComments(id: Int) {
+        viewModelScope.launch {
+            Log.i("GETCOMMENTS", "Iniciando solicitud para obtener comentarios del post con id=$id")
+
+            try {
+                val response = RetrofitClient.ApiServerComments.getPostCommets(id)
+
+                if (response.isSuccessful) {
+                    val commentsList = response.body() ?: emptyList()
+                    _postCommentsList.value = commentsList
+
+                    Log.i("GETCOMMENTS_SUCCESS", "✅ Comentarios obtenidos correctamente (${commentsList.size} encontrados)")
+                    Log.i("GETCOMMENTS_SUCCESS", "✅ BODY: ${response.body()}")
+                    commentsList.forEachIndexed { index, comment ->
+                        Log.d("GETCOMMENTS_ITEM", "[$index] id=${comment.id}, contenido=${comment.content}, usuario=${comment.userId}")
+                    }
+
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    _postCommentsList.value = emptyList()
+
+                    Log.e(
+                        "GETCOMMENTS_ERROR",
+                        """
+                    ❌ Error al obtener comentarios.
+                    Código HTTP: ${response.code()}
+                    Mensaje: ${response.message()}
+                    Error body: $errorBody
+                    """.trimIndent()
+                    )
+                }
+
+            } catch (e: Exception) {
+                Log.e(
+                    "GETCOMMENTS_EXCEPTION",
+                    "💥 Excepción al obtener comentarios: ${e.localizedMessage}",
+                    e
+                )
+            } finally {
+                Log.i("GETCOMMENTS", "Finalizó la solicitud de comentarios para el post id=$id")
+            }
+        }
+    }
+
+    fun responsePost(comment: CreateComment) {
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.ApiServerForum.responseAPost(id, comment)
+                val response = RetrofitClient.ApiServerComments.addComment(comment)
+
                 if (response.isSuccessful) {
                     val postResponse = response.body()
+                    Log.i("COMMENT_POST", "Comentario agregado correctamente: $postResponse")
+                    _uiEvent.emit(UIEvent.Showsnackbar("Comentario agregado correctamente"))
                 } else {
-                    _uiEvent.emit(UIEvent.Showsnackbar("Error al responder el post " + response.code()))
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("COMMENT_POST", "Error ${response.code()} al enviar comentario: $errorBody")
+                    _uiEvent.emit(UIEvent.Showsnackbar("Error al responder el post (${response.code()})"))
                 }
+
             } catch (e: Exception) {
-                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
+                Log.e("COMMENT_POST", "Excepción al enviar comentario: ${e.message}", e)
+                _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor: ${e.localizedMessage ?: "desconocido"}"))
             }
         }
     }

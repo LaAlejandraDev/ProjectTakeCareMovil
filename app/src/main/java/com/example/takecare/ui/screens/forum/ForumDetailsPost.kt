@@ -1,5 +1,6 @@
 package com.example.takecare.ui.screens.forum
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,8 +12,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.takecare.data.models.CreateComment
 import com.example.takecare.ui.screens.forum.components.OpenPost
 import com.example.takecare.ui.screens.forum.components.OpenPostActions
 import com.example.takecare.ui.screens.forum.components.OpenPostAvatarHeader
@@ -31,10 +37,34 @@ import com.example.takecare.ui.screens.forum.components.OpenPostHeader
 @Composable
 fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavController) {
     val openPost by forumViewModel.openPost.collectAsState()
+    var commentText by remember { mutableStateOf("") }
+
+    val userId = forumViewModel.userId.collectAsState().value
+    val comments = forumViewModel.postCommentList.collectAsState().value
+
+    fun createNewComment() {
+        openPost?.let {
+            val newComment = CreateComment(
+                postId = it.id,
+                content = commentText,
+                userId = userId
+            )
+            forumViewModel.responsePost(newComment)
+        }
+    }
+
+    LaunchedEffect(openPost) {
+        openPost?.let { forumViewModel.getPostComments(it.id) }
+        Log.i("DETAILSPOST", "Se obtuvo el id del usuario $userId")
+    }
 
     Scaffold(
         bottomBar = {
-            OpenPostBottomBar()
+            OpenPostBottomBar(
+                onSendClick = { createNewComment() },
+                onContentChange = { commentText = it },
+                commentText
+            )
         }
     ) { innerPadding ->
         Column(
@@ -50,9 +80,9 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
                         rootNavController = rootNavController
                     )
                     OpenPostBody(openPost)
-                    OpenPostActions(openPost)
+                    OpenPostActions(openPost, comments.size)
                     OpenPostAvatarHeader(openPost)
-                    OpenPostComments(openPost)
+                    OpenPostComments(comments)
                 }
             } else {
                 ErrorPost()

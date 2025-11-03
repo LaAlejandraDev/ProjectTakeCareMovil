@@ -21,7 +21,11 @@ class LoginViewModel : ViewModel() {
     val loginSuccess: State<Boolean> = _loginSuccess
 
     private val _isVerifyingSession = MutableStateFlow(false)
+
     val isVerifyingSession: StateFlow<Boolean> = _isVerifyingSession
+
+    private val _isTokenSaved = MutableStateFlow<Boolean>(false)
+    val isTokenSaved : StateFlow<Boolean> = _isTokenSaved
 
     fun loginUser(email: String, password: String, context: Context) {
         viewModelScope.launch {
@@ -54,6 +58,9 @@ class LoginViewModel : ViewModel() {
             _isVerifyingSession.value = true
 
             val token = sessionManager.getToken().firstOrNull()
+            _isTokenSaved.value = token != null
+
+            Log.i("TokenGuardado", "Estado del token: $isTokenSaved")
 
             if (!token.isNullOrEmpty()) {
                 Log.i("TokenLogin", "Sí hay token: $token")
@@ -79,6 +86,8 @@ class LoginViewModel : ViewModel() {
 
             delay(1000)
             _isVerifyingSession.value = false
+
+            Log.i("LoginState", "EL login fue: ${_loginSuccess.value}")
         }
     }
 }

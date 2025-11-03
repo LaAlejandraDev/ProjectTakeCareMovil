@@ -66,6 +66,8 @@ fun ForumCreatePost(forumViewModel: ForumViewModel = viewModel(), profileViewMod
                 isAnonymous = false
             )
             forumViewModel.addPost(newPost)
+        } else {
+            Log.e("USERERROR", "No se pudo crear el post")
         }
     }
 
