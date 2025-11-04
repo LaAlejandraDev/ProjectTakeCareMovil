@@ -19,4 +19,7 @@ interface ApiUsers {
 
     @POST("Pacientes")
     suspend fun addUser(@Body user: PatientModel): Response<PatientModel>
+
+    @GET("Pacientes/usuario/{id}")
+    suspend fun getPatient(@Path("id") id: Int): Response<PatientModel>
 }

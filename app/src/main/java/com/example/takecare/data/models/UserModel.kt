@@ -24,6 +24,9 @@ data class User(
     @SerializedName("contrasena")
     val password: String? = null,
 
+    @SerializedName("genero")
+    val gender: String?,
+
     @SerializedName("rol")
     val type: Int? = null,
 

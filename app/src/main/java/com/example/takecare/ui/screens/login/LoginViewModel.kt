@@ -38,7 +38,7 @@ class LoginViewModel : ViewModel() {
                         token = body.token,
                         userId = body.user.id,
                         userName = body.user.name,
-                        email = body.user.email
+                        email = body.user.email,
                     )
                     Log.i("TOKENGUARDADO", body.token)
                     _loginSuccess.value = true

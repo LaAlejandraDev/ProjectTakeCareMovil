@@ -9,8 +9,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -33,8 +38,12 @@ import androidx.navigation.NavHostController
 import com.example.takecare.data.models.RegisterUserModel
 import com.example.takecare.ui.components.OutlinedTextFieldComponent
 import com.example.takecare.ui.navigation.Routes
+import com.example.takecare.ui.screens.profile.components.DatePickerModal
+import com.example.takecare.ui.screens.profile.components.SelectField
 import com.example.takecare.ui.screens.register.RegisterViewModel
+import kotlin.text.ifEmpty
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalDataFrame(
     name: String,
@@ -43,15 +52,20 @@ fun PersonalDataFrame(
     onFirstLastNameChange: (String) -> Unit,
     secondLastName: String,
     onSecondLastNameChange: (String) -> Unit,
-    bornDate: String,
-    onBornDateChange: (String) -> Unit,
+    bornDate: Long?,
+    onBornDateChange: (Long?) -> Unit,
     gender: String,
     onGenderChange: (String) -> Unit
 ) {
-    Column (
-        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(12.dp),
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
-    ){
+    ) {
         Text(
             "Datos personales",
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
@@ -60,32 +74,61 @@ fun PersonalDataFrame(
             "Ingresa tu información personal y presiona el botón “Siguiente” para continuar.",
             style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
         )
+
         StringTextField( // Nombre
             value = name,
             label = "Nombre",
             onValueChange = onNameChange
         )
+
         StringTextField( // Apellido Paterno
             value = firstLastName,
             label = "Apellido Paterno",
             onValueChange = onFirstLastNameChange
         )
+
         StringTextField( // Apellido Materno
             value = secondLastName,
             label = "Apellido Materno",
             onValueChange = onSecondLastNameChange
         )
-        StringTextField( // Fecha de nacimiento
-            value = bornDate,
-            label = "Apellido Materno",
-            onValueChange = onBornDateChange,
+
+        OutlinedTextField(
+            value = bornDate?.let { millisToDateString(it) } ?: "",
+            onValueChange = {},
+            label = { Text("Fecha de nacimiento") },
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { showDatePicker = true }) {
+                    Icon(Icons.Default.DateRange, contentDescription = "Elegir fecha")
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
         )
-        StringTextField( // Genero
-            value = gender,
-            label = "Genero",
-            onValueChange = onGenderChange
+
+        SelectField(
+            label = "Género",
+            options = listOf("Seleccionar...", "Femenino", "Masculino", "No binario"),
+            selectedOption = gender.ifEmpty { "Seleccionar..." },
+            onOptionSelected = { if (it != "Seleccionar...") onGenderChange(it) }
         )
     }
+
+    if (showDatePicker) {
+        DatePickerModal(
+            title = "Selecciona tu fecha de nacimiento",
+            initialDate = bornDate,
+            onDateSelected = {
+                onBornDateChange(it)
+            },
+            onDismiss = { showDatePicker = false }
+        )
+    }
+}
+
+private fun millisToDateString(millis: Long): String {
+    val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+    return formatter.format(java.util.Date(millis))
 }
 
 @Composable
@@ -161,10 +204,12 @@ fun MedicalInfoDataFrame(
             label = "Antecedentes Medicos",
             onValueChange = onMedicalBgChange,
         )
-        StringTextField( // Estado civil
-            value = martialStatus,
-            label = "Estado Civil",
-            onValueChange = onMartialStatusChange,
+
+        SelectField(
+            label = "Género",
+            options = listOf("Seleccionar...", "Solter@", "Casad@", "Divorciad@", "Viud@"),
+            selectedOption = martialStatus.ifEmpty { "Seleccionar..." },
+            onOptionSelected = { if (it != "Seleccionar...") onMartialStatusChange(it) }
         )
     }
 }

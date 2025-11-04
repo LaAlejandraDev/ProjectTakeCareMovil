@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.User
+import com.example.takecare.ui.Utils.convertMillisToDate
 import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.register.components.ContactDataFrame
 import com.example.takecare.ui.screens.register.components.EmergencyDataFrame
@@ -58,6 +59,8 @@ fun RegisterScreen(
     var city by remember { mutableStateOf("") }
     var emergencyContact by remember { mutableStateOf("") }
 
+    var bornDatePicked by remember { mutableStateOf<Long?>(null) }
+
     val totalSteps = 4
     var currentStep by remember { mutableStateOf(0) }
     val progress by animateFloatAsState(
@@ -73,20 +76,19 @@ fun RegisterScreen(
             email = email,
             phone = phoneNumber,
             password = password,
+            gender = gender,
             type = 0,
         )
 
         val newPatient = PatientModel(
             city = city,
-            martialStatus = martialStatus,
+            maritalStatus = martialStatus,
             diagnostic = diagnostic,
             medicalBackground = medicalBackground,
-            gender = gender,
             emergencyContact = emergencyContact,
             user = newUser,
             id = 0,
             userId = 0,
-            bornDate = bornDate
         )
 
         registerViewModel.createNewUser(newPatient)
@@ -169,8 +171,8 @@ fun RegisterScreen(
                         { firstLastName = it },
                         secondLastName,
                         { secondLastName = it },
-                        bornDate,
-                        { bornDate = it },
+                        bornDate = bornDatePicked,
+                        { bornDate = convertMillisToDate(it) },
                         gender,
                         { gender = it }
                     )
