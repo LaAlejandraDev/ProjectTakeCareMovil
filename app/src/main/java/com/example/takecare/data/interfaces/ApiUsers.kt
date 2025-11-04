@@ -7,6 +7,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -22,4 +23,6 @@ interface ApiUsers {
 
     @GET("Pacientes/usuario/{id}")
     suspend fun getPatient(@Path("id") id: Int): Response<PatientModel>
+    @PUT("Pacientes/{id}")
+    suspend fun updatePatient(@Path("id") id: Int, @Body patientModel: PatientModel): Response<PatientModel>
 }

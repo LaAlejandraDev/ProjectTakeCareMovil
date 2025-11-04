@@ -21,6 +21,9 @@ class ProfileViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _isUpdating = MutableStateFlow(false)
+    val isUpdating: StateFlow<Boolean> = _isUpdating
     fun selectUser(context: Context) {
         viewModelScope.launch {
             val sessionManager = SessionManager(context)
@@ -66,6 +69,20 @@ class ProfileViewModel : ViewModel() {
                 Log.e("GET_PATIENT", "Error de excepcion " + e.message)
             }  finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun updatePatient(context: Context, updatedPatient: PatientModel) {
+        viewModelScope.launch {
+            _isUpdating.value = true
+            try {
+                val idPatient = updatedPatient.id
+                val response = RetrofitClient.ApiServerUsers.updatePatient(idPatient!!, updatedPatient)
+            } catch (e: Exception) {
+
+            } finally {
+                _isUpdating.value = false
             }
         }
     }

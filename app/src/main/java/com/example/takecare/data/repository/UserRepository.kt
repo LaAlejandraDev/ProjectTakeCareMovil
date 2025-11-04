@@ -21,4 +21,8 @@ class UserRepository(private val apiUsers: ApiUsers) {
     suspend fun getPatient(id: Int): Response<PatientModel> {
         return apiUsers.getPatient(id)
     }
+
+    suspend fun updatePatient(id: Int, patientModel: PatientModel): Response<PatientModel> {
+        return apiUsers.updatePatient(id, patientModel)
+    }
 }
