@@ -11,6 +11,11 @@ data class Message (
     val date: String
 )
 
+data class MessageTemp (
+    val user: String,
+    val content: String
+)
+
 enum class MessageState {
     SENT,
     DELIVERED,

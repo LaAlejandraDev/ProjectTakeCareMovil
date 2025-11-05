@@ -9,6 +9,8 @@ import com.example.takecare.ui.navigation.HomeRoutes
 import com.example.takecare.ui.screens.forum.ForumDetailsPost
 import com.example.takecare.ui.screens.forum.ForumViewModel
 import com.example.takecare.ui.screens.home.components.AppScaffoldNavHost
+import com.example.takecare.ui.screens.messages.ChatScreen
+import com.example.takecare.ui.screens.messages.MessagesScreen
 
 @Composable
 fun HomeScreen() {
@@ -26,6 +28,10 @@ fun HomeScreen() {
 
         composable(HomeRoutes.OpenPost.route) {
             ForumDetailsPost(forumViewModel, rootNavController)
+        }
+
+        composable ("chat_scaffold") {
+            ChatScreen(rootNavController)
         }
     }
 }

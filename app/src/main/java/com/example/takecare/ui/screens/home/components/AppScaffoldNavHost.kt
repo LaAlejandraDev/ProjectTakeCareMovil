@@ -17,7 +17,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,9 +27,9 @@ import com.example.takecare.ui.components.ButtonSize
 import com.example.takecare.ui.components.FloatingPostButton
 import com.example.takecare.ui.navigation.HomeRoutes
 import com.example.takecare.ui.screens.forum.ForumCreatePost
-import com.example.takecare.ui.screens.forum.ForumDetailsPost
 import com.example.takecare.ui.screens.forum.ForumScreen
 import com.example.takecare.ui.screens.forum.ForumViewModel
+import com.example.takecare.ui.screens.messages.MessagesScreen
 import com.example.takecare.ui.screens.profile.ProfileScreen
 import kotlinx.coroutines.coroutineScope
 
@@ -84,7 +83,7 @@ fun AppScaffoldNavHost(rootNavController : NavController, forumViewModel: ForumV
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(HomeRoutes.Home.route) { ForumScreen(forumViewModel, rootNavController) }
-            //composable(HomeRoutes.Messages.route) { MessagesScreen() }
+            composable(HomeRoutes.Messages.route) { MessagesScreen(rootNavController) }
             //composable(HomeRoutes.Diary.route) { DiaryScreen() }
             composable(HomeRoutes.Profile.route) { ProfileScreen() }
             composable(HomeRoutes.CreatePost.route) { ForumCreatePost() }

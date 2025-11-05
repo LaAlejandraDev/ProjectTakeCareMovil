@@ -55,7 +55,7 @@ fun OpenPostBottomBar(
             OutlinedTextField(
                 value = commentText,
                 onValueChange = onContentChange,
-                placeholder = { Text("Escribe un comentario...") },
+                placeholder = { Text("Escribe algo...") },
                 modifier = Modifier
                     .weight(1f)
                     .height(52.dp)

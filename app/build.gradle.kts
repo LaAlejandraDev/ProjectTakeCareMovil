@@ -45,6 +45,8 @@ android {
 }
 
 dependencies {
+    implementation("com.microsoft.signalr:signalr:7.0.5")
+
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("com.google.code.gson:gson:2.11.0")
