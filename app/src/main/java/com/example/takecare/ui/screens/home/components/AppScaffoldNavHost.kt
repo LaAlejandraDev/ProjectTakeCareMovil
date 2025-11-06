@@ -31,6 +31,7 @@ import com.example.takecare.ui.screens.forum.ForumScreen
 import com.example.takecare.ui.screens.forum.ForumViewModel
 import com.example.takecare.ui.screens.messages.MessagesScreen
 import com.example.takecare.ui.screens.profile.ProfileScreen
+import com.example.takecare.ui.screens.psycologist.PsycoListScreen
 import kotlinx.coroutines.coroutineScope
 
 @Composable
@@ -58,10 +59,18 @@ fun AppScaffoldNavHost(rootNavController : NavController, forumViewModel: ForumV
     Scaffold (
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant),
+        topBar = {
+            if (currentRoute == HomeRoutes.Messages.route) {
+                TopBarMessages(
+                    onNewChat = {
+                        rootNavController.navigate("psyco_list")
+                    }
+                )
+            }
+        },
         bottomBar = {
             BottomTabBar(navController, currentRoute = currentRoute)
         },
-
         floatingActionButton = {
             if (currentRoute == HomeRoutes.Home.route) {
                 Column (

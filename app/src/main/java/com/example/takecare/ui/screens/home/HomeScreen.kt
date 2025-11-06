@@ -10,7 +10,7 @@ import com.example.takecare.ui.screens.forum.ForumDetailsPost
 import com.example.takecare.ui.screens.forum.ForumViewModel
 import com.example.takecare.ui.screens.home.components.AppScaffoldNavHost
 import com.example.takecare.ui.screens.messages.ChatScreen
-import com.example.takecare.ui.screens.messages.MessagesScreen
+import com.example.takecare.ui.screens.psycologist.PsycoListScreen
 
 @Composable
 fun HomeScreen() {
@@ -32,6 +32,10 @@ fun HomeScreen() {
 
         composable ("chat_scaffold") {
             ChatScreen(rootNavController)
+        }
+
+        composable ("psyco_list") {
+            PsycoListScreen()
         }
     }
 }

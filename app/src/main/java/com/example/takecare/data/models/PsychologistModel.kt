@@ -1,24 +1,37 @@
 package com.example.takecare.data.models
-
 import com.google.gson.annotations.SerializedName
 
-data class PsychologistModel (
-    @SerializedName("Id")
+data class PsychologistModel(
+    @SerializedName("id")
     val id: Int,
-    @SerializedName("UsuarioId")
-    val userId: Int,
-    @SerializedName("Usuario")
-    val user: User,
-    @SerializedName("Especialidad")
-    val specialty: String,
-    @SerializedName("CedulaProfesional")
-    val professionalID: String,
-    @SerializedName("Matricula")
-    val tuition: String,
-    @SerializedName("ReferenciaProfesional")
-    val professionalReference: String,
-    @SerializedName("Activo")
-    val isActive: Boolean,
-    @SerializedName("Pacientes")
-    val patientList: List<PatientModel?>
+
+    @SerializedName("idUsuario")
+    val idUsuario: Int,
+
+    @SerializedName("cedulaProfesional")
+    val cedulaProfesional: String,
+
+    @SerializedName("especialidad")
+    val especialidad: String,
+
+    @SerializedName("descripcion")
+    val descripcion: String,
+
+    @SerializedName("experienciaAnios")
+    val experienciaAnios: Int,
+
+    @SerializedName("universidadEgreso")
+    val universidadEgreso: String,
+
+    @SerializedName("direccionConsultorio")
+    val direccionConsultorio: String,
+
+    @SerializedName("calificacionPromedio")
+    val calificacionPromedio: Double,
+
+    @SerializedName("totalResenas")
+    val totalResenas: Int,
+
+    @SerializedName("usuario")
+    val usuario: User?
 )

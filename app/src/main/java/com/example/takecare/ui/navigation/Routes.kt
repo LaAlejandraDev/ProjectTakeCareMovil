@@ -16,4 +16,5 @@ sealed class HomeRoutes(val route: String, val label: String, val icon: Int) {
     object Profile : HomeRoutes("profile", "Perfil", R.drawable.profile)
     object CreatePost : HomeRoutes("createPost", "Crear Post", android.R.drawable.btn_plus)
     object OpenPost : HomeRoutes("openPost", "Post Abierto", android.R.drawable.btn_plus)
+    object PsycoList : HomeRoutes("psycoList", "Lista de psicologos", android.R.drawable.btn_plus)
 }

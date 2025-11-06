@@ -1,5 +1,6 @@
 package com.example.takecare.data.client
 
+import com.example.takecare.data.interfaces.ApiChat
 import com.example.takecare.data.interfaces.ApiComments
 import com.example.takecare.data.interfaces.ApiForum
 import com.example.takecare.data.interfaces.ApiLogin
@@ -40,5 +41,13 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiComments::class.java)
+    }
+
+    val ApiServerChats: ApiChat by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiChat::class.java)
     }
 }
