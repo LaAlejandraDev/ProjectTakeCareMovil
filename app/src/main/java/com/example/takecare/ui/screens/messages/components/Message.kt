@@ -9,13 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun MessageComponent(
-    user: String,
     message: String,
     owner: Boolean = false
 ) {
@@ -50,15 +47,6 @@ fun MessageComponent(
                 .padding(12.dp),
             horizontalAlignment = if (owner) Alignment.End else Alignment.Start
         ) {
-            Text(
-                text = user,
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = textColor.copy(alpha = 0.8f)
-                ),
-                textAlign = if (owner) TextAlign.End else TextAlign.Start
-            )
-            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodyMedium.copy(color = textColor)

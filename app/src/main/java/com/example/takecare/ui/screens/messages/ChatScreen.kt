@@ -11,13 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.takecare.data.models.AllData.MessageAllDataModel
 import com.example.takecare.data.models.Insert.MessageModelCreate
-import com.example.takecare.data.models.MessageTemp
 import com.example.takecare.ui.screens.forum.components.OpenPostBottomBar
 import com.example.takecare.ui.screens.messages.components.MessageComponent
 import com.example.takecare.ui.screens.messages.components.TopBarChat
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -27,8 +28,12 @@ fun ChatScreen(
     chatViewModel: ChatViewModel = viewModel()
 ) {
     var newMessage by remember { mutableStateOf("") }
-    val messageList = remember { mutableStateListOf<MessageTemp>() }
+
     val chatData = chatViewModel.chatData.collectAsState().value
+    val chatMessages = chatViewModel.chatMessagesData.collectAsState().value
+    val chatInfo = chatViewModel.chatInfo.collectAsState().value
+
+    val tempMessages = remember { mutableStateListOf<MessageAllDataModel>() }
 
     val hubConnection: HubConnection = remember {
         HubConnectionBuilder.create("http://192.168.0.107:5002/chathub").build()
@@ -36,11 +41,17 @@ fun ChatScreen(
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    val currentUser = "AppAndroid"
+    val currentUserId = chatData?.idPatient ?: -1
 
-    fun createNewMessage() {
+    LaunchedEffect(chatMessages) {
+        tempMessages.clear()
+        tempMessages.addAll(chatMessages)
+    }
+
+    fun createNewMessage(onResult: (Boolean) -> Unit) {
         if (chatId.isNullOrBlank() || chatData == null) {
             Log.w("MESSAGE_SEND", "No se pudo crear mensaje: chatId o chatData nulo.")
+            onResult(false)
             return
         }
 
@@ -51,29 +62,48 @@ fun ChatScreen(
             isRead = true
         )
 
-        Log.i("MESSAGE_SEND", "Enviando mensaje: ${newMessageData.message}")
-        chatViewModel.createNewMessage(newMessageData)
+        Log.i("MESSAGE_SEND", "Enviando mensaje a la API: ${newMessageData.message}")
+
+        chatViewModel.createNewMessage(newMessageData) { success ->
+            if (success) {
+                Log.i("MESSAGE_UI_UPDATE", "Mensaje agregado localmente a la lista temporal")
+                onResult(true)
+            } else {
+                Log.e("MESSAGE_UI_ERROR", "No se pudo agregar mensaje localmente (falló el envío)")
+                onResult(false)
+            }
+        }
     }
 
-    LaunchedEffect(chatId) {
+    LaunchedEffect(Unit) {
         if (!chatId.isNullOrBlank()) {
-            Log.i("CHAT_ID_GET", "ID del chat recibido: $chatId")
-            try {
-                chatViewModel.getChatData(chatId.toInt())
-            } catch (e: Exception) {
-                Log.e("CHAT_ID_ERROR", "Error al obtener chat con ID $chatId: ${e.message}")
-            }
-        } else {
-            Log.w("CHAT_ID_NULL", "chatId es nulo o vacío, no se cargó el chat.")
+            Log.i("MENSAJES", "EJECUTANDO LISTA DE MENSAJES")
+            chatViewModel.getChatInfo(chatId.toInt())
+            chatViewModel.getChatData(chatId.toInt())
+            chatViewModel.getChatMessages(chatId.toInt())
         }
     }
 
     LaunchedEffect(Unit) {
         hubConnection.on("ReceiveMessage", { user: String, message: String ->
-            Log.i("MESSAGE", "Mensaje recibido: $user -> $message")
-            messageList.add(MessageTemp(user, message))
+            Log.i("MESSAGE_RECEIVED", "Mensaje recibido: $user -> $message")
+
+            tempMessages.add(
+                MessageAllDataModel(
+                    id = -1,
+                    chatId = chatId?.toInt() ?: 0,
+                    senderId = user.toIntOrNull() ?: 0,
+                    message = message,
+                    readed = false,
+                    date = ""
+                )
+            )
+
             coroutineScope.launch {
-                listState.animateScrollToItem(messageList.size - 1)
+                delay(100)
+                if (tempMessages.isNotEmpty()) {
+                    listState.animateScrollToItem(tempMessages.size - 1)
+                }
             }
         }, String::class.java, String::class.java)
 
@@ -88,8 +118,17 @@ fun ChatScreen(
     fun sendMessage() {
         if (newMessage.isNotBlank()) {
             Log.i("MESSAGE_SEND", "Enviando mensaje por SignalR: $newMessage")
-            hubConnection.send("SendMessage", currentUser, newMessage)
-            createNewMessage()
+            hubConnection.send("SendMessage", currentUserId.toString(), newMessage)
+
+            createNewMessage { success ->
+                if (success) {
+                    coroutineScope.launch {
+                        delay(100)
+                        listState.animateScrollToItem(tempMessages.size - 1)
+                    }
+                }
+            }
+
             newMessage = ""
         } else {
             Log.w("MESSAGE_EMPTY", "Intento de enviar mensaje vacío.")
@@ -98,9 +137,7 @@ fun ChatScreen(
 
     Scaffold(
         topBar = {
-            chatData?.let {
-                TopBarChat(navController, it)
-            }
+            chatInfo?.let { TopBarChat(navController, it) }
         },
         bottomBar = {
             if (chatId != null) {
@@ -111,10 +148,7 @@ fun ChatScreen(
                 )
             } else {
                 BottomAppBar {
-                    Text(
-                        "Chat no disponible",
-                        modifier = Modifier.padding(16.dp)
-                    )
+                    Text("Chat no disponible", modifier = Modifier.padding(16.dp))
                 }
             }
         }
@@ -124,43 +158,30 @@ fun ChatScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            if (chatId == null) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                    Text(
-                        text = "No se encontró información del chat.",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    state = listState
-                ) {
-                    if (messageList.isEmpty()) {
-                        item {
-                            Text(
-                                "No hay mensajes aún",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp),
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    } else {
-                        items(messageList) { msg ->
-                            MessageComponent(
-                                user = msg.user,
-                                message = msg.content,
-                                owner = msg.user == currentUser
-                            )
-                        }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                state = listState
+            ) {
+                if (tempMessages.isEmpty()) {
+                    item {
+                        Text(
+                            "No hay mensajes aún",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                } else {
+                    items(tempMessages) { msg ->
+                        MessageComponent(
+                            message = msg.message,
+                            owner = msg.senderId == currentUserId
+                        )
                     }
                 }
             }

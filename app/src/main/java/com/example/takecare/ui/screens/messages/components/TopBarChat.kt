@@ -22,7 +22,7 @@ import com.example.takecare.data.models.Insert.ChatModel
 import com.example.takecare.ui.navigation.HomeRoutes
 
 @Composable
-fun TopBarChat(navController: NavController, chatData: ChatModel) {
+fun TopBarChat(navController: NavController, chatData: ChatAllDataModel) {
     val context = LocalContext.current
 
     Surface (
@@ -44,7 +44,7 @@ fun TopBarChat(navController: NavController, chatData: ChatModel) {
             ) {
                 Text("Regresar", color = Color.Black)
             }
-            Text("${chatData.idPsychologist}")
+            Text("${chatData.psychologistName}")
         }
     }
 }

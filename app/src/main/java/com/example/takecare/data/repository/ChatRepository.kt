@@ -2,6 +2,7 @@ package com.example.takecare.data.repository
 
 import ChatAllDataModel
 import com.example.takecare.data.interfaces.ApiChat
+import com.example.takecare.data.models.AllData.MessageAllDataModel
 import com.example.takecare.data.models.Insert.ChatModel
 import com.example.takecare.data.models.Insert.MessageModelCreate
 import com.example.takecare.data.models.PsychologistModel
@@ -30,5 +31,13 @@ class ChatRepository(private val apiService: ApiChat) {
 
     suspend fun getChat(chatId: Int): Response<ChatModel> {
         return apiService.getChat(chatId)
+    }
+
+    suspend fun getChatMessages(chatId: Int): Response<List<MessageAllDataModel>> {
+        return apiService.getChatMessages(chatId)
+    }
+
+    suspend fun getChatInfo(chatId: Int): Response<ChatAllDataModel> {
+        return apiService.getChatInfo(chatId)
     }
 }

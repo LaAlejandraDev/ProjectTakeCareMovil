@@ -1,6 +1,7 @@
 package com.example.takecare.data.interfaces
 
 import ChatAllDataModel
+import com.example.takecare.data.models.AllData.MessageAllDataModel
 import com.example.takecare.data.models.Insert.ChatModel
 import com.example.takecare.data.models.Insert.MessageModelCreate
 import com.example.takecare.data.models.PsychologistModel
@@ -30,4 +31,10 @@ interface ApiChat {
     suspend fun postNewMessage(@Body newMessage: MessageModelCreate): Response<MessageModelCreate>
     @GET("Chats/{id}")
     suspend fun getChat(@Path ("id") chatId: Int) : Response<ChatModel>
+
+    @GET("ChatMensajes/chat/{chatId}")
+    suspend fun getChatMessages(@Path ("chatId") chatId: Int): Response<List<MessageAllDataModel>>
+
+    @GET("Chats/chatinfo/{chatId}")
+    suspend fun getChatInfo(@Path ("chatId") chatId: Int): Response<ChatAllDataModel>
 }
