@@ -2,9 +2,11 @@ package com.example.takecare.ui.screens.home
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.takecare.ui.navigation.HomeRoutes
 import com.example.takecare.ui.screens.forum.ForumDetailsPost
 import com.example.takecare.ui.screens.forum.ForumViewModel
@@ -30,8 +32,14 @@ fun HomeScreen() {
             ForumDetailsPost(forumViewModel, rootNavController)
         }
 
-        composable ("chat_scaffold") {
-            ChatScreen(rootNavController)
+        composable(
+            route = "chat_scaffold/{chatId}",
+            arguments = listOf(
+                navArgument("chatId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val chatId = backStackEntry.arguments?.getString("chatId")
+            ChatScreen(navController = rootNavController, chatId = chatId)
         }
 
         composable ("psyco_list") {

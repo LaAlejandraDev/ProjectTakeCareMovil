@@ -9,11 +9,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.User
+import com.example.takecare.ui.Utils.SessionManager
 import com.example.takecare.ui.screens.forum.components.Avatar
 import com.example.takecare.ui.screens.profile.components.SelectField
 import com.example.takecare.ui.screens.profile.components.TextFieldUser
@@ -21,12 +23,15 @@ import com.example.takecare.ui.screens.profile.components.TextFieldUser
 @Composable
 fun ProfileEditForm(
     patient: PatientModel?,
+    onLogout: () -> Unit,
     onSave: (PatientModel) -> Unit
 ) {
     if (patient == null) {
         Text("No se encontraron datos del paciente", color = MaterialTheme.colorScheme.error)
         return
     }
+
+    val context = LocalContext.current
 
     var name by remember { mutableStateOf(patient.user?.name ?: "") }
     var firstLastName by remember { mutableStateOf(patient.user?.firstLastName ?: "") }
@@ -52,6 +57,14 @@ fun ProfileEditForm(
             initials = name.firstOrNull()?.toString() ?: "?",
             size = 60.dp
         )
+
+        Button(
+            onClick = {
+                onLogout()
+            }
+        ) {
+            Text("Cerrar Sesion")
+        }
 
         Text(
             "$name $firstLastName",

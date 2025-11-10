@@ -33,14 +33,6 @@ fun TopBarMessages(onNewChat: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Mensajes", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-            TextButton(
-                onClick = {
-                    Toast.makeText(context, "Abriendo un nuevo chat", Toast.LENGTH_SHORT).show()
-                    onNewChat()
-                }
-            ) {
-                Text("Nuevo Chat")
-            }
         }
     }
 }

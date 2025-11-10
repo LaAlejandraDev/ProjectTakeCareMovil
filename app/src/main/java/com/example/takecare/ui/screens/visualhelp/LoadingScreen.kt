@@ -30,7 +30,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun LoadingScreen(
-    message: String
+    message: String,
 ) {
     Surface(
         modifier = Modifier

@@ -1,5 +1,6 @@
 package com.example.takecare.ui.screens.messages
 
+import ChatAllDataModel
 import ChatItem
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,16 +17,30 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.takecare.data.models.ChatModel
+import com.example.takecare.data.models.Insert.ChatModel
+import com.example.takecare.ui.screens.profile.ProfileViewModel
 
 @Composable
-fun MessagesScreen(navController: NavController, messagesViewModel: MessagesViewModel = viewModel()) {
+fun MessagesScreen(navController: NavController, messagesViewModel: MessagesViewModel = viewModel(), profileViewModel: ProfileViewModel = viewModel()) {
     val chatList = messagesViewModel.chatList.collectAsState().value
+    val selectedPatient = profileViewModel.selectedPatient.collectAsState().value
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        profileViewModel.getPatient(context)
+    }
+
+    LaunchedEffect(selectedPatient) {
+        selectedPatient?.let { patient ->
+            messagesViewModel.getAllChats(patient.id!!)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -40,14 +55,15 @@ fun MessagesScreen(navController: NavController, messagesViewModel: MessagesView
 }
 
 @Composable
-fun ChatList(navController: NavController, chatList: List<ChatModel>) {
+fun ChatList(navController: NavController, chatList: List<ChatAllDataModel>) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
     ) {
         items(chatList) { chat ->
             ChatItem(
+                chatData = chat,
                 onClickChat = {
-                    navController.navigate("chat_scaffold")
+                    navController.navigate("chat_scaffold/${chat.id}")
                 }
             )
         }

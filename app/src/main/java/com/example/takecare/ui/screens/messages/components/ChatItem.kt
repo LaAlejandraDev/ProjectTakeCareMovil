@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ChatItem(
+    chatData: ChatAllDataModel,
     onClickChat: () -> Unit
 ) {
     Row(
@@ -26,8 +27,8 @@ fun ChatItem(
     ) {
         Avatar(initials = "J")
         Column {
-            ChatHeader("Juan Pablo")
-            ChatBody("Hola papu, como estas?")
+            ChatHeader(userName = "${chatData.psychologistName}")
+            ChatBody(content = "${chatData.specialty}")
         }
     }
 }

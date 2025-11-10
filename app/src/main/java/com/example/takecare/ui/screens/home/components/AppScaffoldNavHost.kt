@@ -31,7 +31,6 @@ import com.example.takecare.ui.screens.forum.ForumScreen
 import com.example.takecare.ui.screens.forum.ForumViewModel
 import com.example.takecare.ui.screens.messages.MessagesScreen
 import com.example.takecare.ui.screens.profile.ProfileScreen
-import com.example.takecare.ui.screens.psycologist.PsycoListScreen
 import kotlinx.coroutines.coroutineScope
 
 @Composable
@@ -94,7 +93,7 @@ fun AppScaffoldNavHost(rootNavController : NavController, forumViewModel: ForumV
             composable(HomeRoutes.Home.route) { ForumScreen(forumViewModel, rootNavController) }
             composable(HomeRoutes.Messages.route) { MessagesScreen(rootNavController) }
             //composable(HomeRoutes.Diary.route) { DiaryScreen() }
-            composable(HomeRoutes.Profile.route) { ProfileScreen() }
+            composable(HomeRoutes.Profile.route) { ProfileScreen(rootNavController) }
             composable(HomeRoutes.CreatePost.route) { ForumCreatePost() }
         }
     }

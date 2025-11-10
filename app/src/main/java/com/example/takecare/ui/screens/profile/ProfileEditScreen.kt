@@ -11,9 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 
 @Composable
-fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel()) {
+fun ProfileScreen(rootNavController: NavController, profileViewModel: ProfileViewModel = viewModel()) {
     val context = LocalContext.current
     val patient = profileViewModel.selectedPatient.collectAsState().value
     val isLoading = profileViewModel.isLoading.collectAsState().value
@@ -31,7 +32,7 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel()) {
             CircularProgressIndicator()
         }
     } else {
-        ProfileEditForm(patient = patient) { updatedPatient ->
+        ProfileEditForm(patient = patient, onLogout = { profileViewModel.closeSession(context) }) { updatedPatient ->
             profileViewModel.updatePatient(context, updatedPatient)
         }
     }

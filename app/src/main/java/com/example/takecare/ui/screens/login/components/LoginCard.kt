@@ -31,14 +31,14 @@ import com.example.takecare.ui.screens.login.LoginViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel) {
+fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel, onLoginResponse: (Boolean) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginSuccess by loginViewModel.loginSuccess
 
     val context = LocalContext.current
 
-    OutlinedCard (
+    OutlinedCard(
         modifier = Modifier
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -60,7 +60,7 @@ fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel) 
                 superiorLabel = "Ingresa tu correo",
                 value = email,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = { email = it}
+                onValueChange = { email = it }
             )
             OutlinedTextFieldComponent(
                 isPassword = true,
@@ -76,6 +76,7 @@ fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel) 
                 onClick = {
                     loginViewModel.loginUser(email, password, context)
                     if (loginSuccess) navController.navigate(Routes.Home.route)
+                    onLoginResponse(loginSuccess)
                 }
             ) {
                 Text("Iniciar Sesion")

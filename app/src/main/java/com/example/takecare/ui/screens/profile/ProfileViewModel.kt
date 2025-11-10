@@ -86,4 +86,11 @@ class ProfileViewModel : ViewModel() {
             }
         }
     }
+
+    fun closeSession(context: Context) {
+        viewModelScope.launch {
+            val sessionManager = SessionManager(context)
+            sessionManager.clearSession()
+        }
+    }
 }

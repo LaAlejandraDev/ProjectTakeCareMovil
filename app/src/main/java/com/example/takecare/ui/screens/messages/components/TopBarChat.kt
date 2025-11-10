@@ -1,5 +1,6 @@
 package com.example.takecare.ui.screens.messages.components
 
+import ChatAllDataModel
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.takecare.data.models.Insert.ChatModel
 import com.example.takecare.ui.navigation.HomeRoutes
 
 @Composable
-fun TopBarChat(navController: NavController) {
+fun TopBarChat(navController: NavController, chatData: ChatModel) {
     val context = LocalContext.current
 
     Surface (
@@ -42,7 +44,7 @@ fun TopBarChat(navController: NavController) {
             ) {
                 Text("Regresar", color = Color.Black)
             }
-            Text("Juan Pablo (Confleis)")
+            Text("${chatData.idPsychologist}")
         }
     }
 }

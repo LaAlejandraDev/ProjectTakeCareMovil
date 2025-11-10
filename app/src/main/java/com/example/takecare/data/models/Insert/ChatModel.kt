@@ -1,4 +1,4 @@
-package com.example.takecare.data.models
+package com.example.takecare.data.models.Insert
 
 import com.google.gson.annotations.SerializedName
 
