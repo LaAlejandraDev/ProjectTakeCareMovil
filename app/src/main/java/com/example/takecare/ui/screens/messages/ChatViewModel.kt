@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
+import com.example.takecare.data.client.SignalRManager
 import com.example.takecare.data.models.AllData.MessageAllDataModel
 import com.example.takecare.data.models.Insert.ChatModel
 import com.example.takecare.data.models.Insert.MessageModelCreate
@@ -22,6 +23,30 @@ class ChatViewModel : ViewModel() {
     private val _chatInfo = MutableStateFlow<ChatAllDataModel?>(null)
     val chatInfo : StateFlow<ChatAllDataModel?> = _chatInfo
 
+
+    init {
+        viewModelScope.launch {
+            SignalRManager.messages.collect { (user, message) ->
+                val newMsg = MessageAllDataModel(
+                    id = -1,
+                    chatId = 0,
+                    senderId = user.toIntOrNull() ?: 0,
+                    message = message,
+                    readed = false,
+                    date = ""
+                )
+                _chatMessagesData.value += newMsg
+            }
+        }
+    }
+
+    fun connectSignalR() {
+        SignalRManager.startConnection()
+    }
+
+    fun sendSignalRMessage(senderId: Int, message: String) {
+        SignalRManager.sendMessage(senderId, message)
+    }
 
     fun setChatMessages(newMessages: List<MessageAllDataModel>) {
         _chatMessagesData.value = newMessages
