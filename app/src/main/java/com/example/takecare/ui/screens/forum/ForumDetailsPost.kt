@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.takecare.data.models.CreateComment
+import com.example.takecare.ui.components.DialogComponent
 import com.example.takecare.ui.screens.forum.components.OpenPost
 import com.example.takecare.ui.screens.forum.components.OpenPostActions
 import com.example.takecare.ui.screens.forum.components.OpenPostAvatarHeader
@@ -42,6 +43,9 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
     val userId = forumViewModel.userId.collectAsState().value
     val comments = forumViewModel.postCommentList.collectAsState().value
 
+    var showDialog by remember { mutableStateOf(false) }
+    var isCommentCreated by remember { mutableStateOf(false) }
+
     fun createNewComment() {
         openPost?.let {
             val newComment = CreateComment(
@@ -49,7 +53,10 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
                 content = commentText,
                 userId = userId
             )
-            forumViewModel.responsePost(newComment)
+            forumViewModel.responsePost(newComment) { isSuccess ->
+                showDialog = true
+                if (isSuccess) isCommentCreated = true else isCommentCreated = false
+            }
         }
     }
 
@@ -75,7 +82,9 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
                 .verticalScroll(rememberScrollState())
         ) {
             if (openPost != null) {
-                OpenPost (modifier = Modifier.fillMaxSize().padding(12.dp)){
+                OpenPost (modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp)){
                     OpenPostHeader(
                         rootNavController = rootNavController
                     )
@@ -83,6 +92,14 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
                     OpenPostActions(openPost, comments.size)
                     OpenPostAvatarHeader(openPost)
                     OpenPostComments(comments)
+                }
+                if (showDialog) {
+                    DialogComponent(
+                        title = if (isCommentCreated) "Comentario publicado" else "No se pudo publicar el comentario",
+                        message = if (isCommentCreated) "Tu comentario se ha enviado correctamente."
+                        else "Ocurrió un problema al enviar tu comentario. Por favor, inténtalo nuevamente más tarde.",
+                        confirmText = "Entendido",
+                        onConfirm = { showDialog = false })
                 }
             } else {
                 ErrorPost()

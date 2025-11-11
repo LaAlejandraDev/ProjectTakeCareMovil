@@ -74,9 +74,10 @@ fun LoginCard(navController: NavHostController, loginViewModel: LoginViewModel, 
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    loginViewModel.loginUser(email, password, context)
-                    if (loginSuccess) navController.navigate(Routes.Home.route)
-                    onLoginResponse(loginSuccess)
+                    loginViewModel.loginUser(email, password, context) { isSuccess ->
+                        if (isSuccess) navController.navigate(Routes.Home.route)
+                        onLoginResponse(isSuccess)
+                    }
                 }
             ) {
                 Text("Iniciar Sesion")

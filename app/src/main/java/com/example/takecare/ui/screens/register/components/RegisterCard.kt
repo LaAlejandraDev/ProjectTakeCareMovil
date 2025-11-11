@@ -52,8 +52,6 @@ fun PersonalDataFrame(
     onFirstLastNameChange: (String) -> Unit,
     secondLastName: String,
     onSecondLastNameChange: (String) -> Unit,
-    bornDate: Long?,
-    onBornDateChange: (Long?) -> Unit,
     gender: String,
     onGenderChange: (String) -> Unit
 ) {
@@ -93,19 +91,6 @@ fun PersonalDataFrame(
             onValueChange = onSecondLastNameChange
         )
 
-        OutlinedTextField(
-            value = bornDate?.let { millisToDateString(it) } ?: "",
-            onValueChange = {},
-            label = { Text("Fecha de nacimiento") },
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { showDatePicker = true }) {
-                    Icon(Icons.Default.DateRange, contentDescription = "Elegir fecha")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
         SelectField(
             label = "Género",
             options = listOf("Seleccionar...", "Femenino", "Masculino", "No binario"),
@@ -114,21 +99,6 @@ fun PersonalDataFrame(
         )
     }
 
-    if (showDatePicker) {
-        DatePickerModal(
-            title = "Selecciona tu fecha de nacimiento",
-            initialDate = bornDate,
-            onDateSelected = {
-                onBornDateChange(it)
-            },
-            onDismiss = { showDatePicker = false }
-        )
-    }
-}
-
-private fun millisToDateString(millis: Long): String {
-    val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-    return formatter.format(java.util.Date(millis))
 }
 
 @Composable
@@ -206,7 +176,7 @@ fun MedicalInfoDataFrame(
         )
 
         SelectField(
-            label = "Género",
+            label = "Estado Civil",
             options = listOf("Seleccionar...", "Solter@", "Casad@", "Divorciad@", "Viud@"),
             selectedOption = martialStatus.ifEmpty { "Seleccionar..." },
             onOptionSelected = { if (it != "Seleccionar...") onMartialStatusChange(it) }

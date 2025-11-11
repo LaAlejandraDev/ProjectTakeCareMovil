@@ -37,6 +37,7 @@ import com.example.takecare.data.models.Comment
 import com.example.takecare.data.models.Insert.PostModelCreate
 import com.example.takecare.data.models.Post
 import com.example.takecare.data.models.PostType
+import com.example.takecare.ui.components.DialogComponent
 import com.example.takecare.ui.screens.profile.ProfileViewModel
 import java.time.Instant
 
@@ -49,6 +50,8 @@ fun ForumCreatePost(forumViewModel: ForumViewModel = viewModel(), profileViewMod
     val localUser by profileViewModel.selectedUser.collectAsState()
     val context = LocalContext.current
     val isoDate = Instant.now().toString()
+    var showDialog by remember { mutableStateOf(false) }
+    var isPostCreated by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         profileViewModel.selectUser(context)
@@ -65,7 +68,14 @@ fun ForumCreatePost(forumViewModel: ForumViewModel = viewModel(), profileViewMod
                 userId = user.id!!,
                 isAnonymous = false
             )
-            forumViewModel.addPost(newPost)
+            forumViewModel.addPost(newPost) { isSuccess ->
+                showDialog = true
+                if (isSuccess) {
+                    isPostCreated = true
+                } else {
+                    isPostCreated = false
+                }
+            }
         } else {
             Log.e("USERERROR", "No se pudo crear el post")
         }
@@ -146,6 +156,15 @@ fun ForumCreatePost(forumViewModel: ForumViewModel = viewModel(), profileViewMod
                 }
             ) {
                 Text("Publicar", color = Color.White)
+            }
+
+            if (showDialog) {
+                DialogComponent(
+                    title = if (isPostCreated) "Publicación creada" else "No se pudo crear la publicación",
+                    message = if (isPostCreated) "Tu publicación se ha creado correctamente y ya está disponible."
+                    else "Ocurrió un problema al crear tu publicación. Por favor, inténtalo de nuevo más tarde.",
+                    confirmText = "Entendido",
+                    onConfirm = { showDialog = false })
             }
         } else {
             Text(

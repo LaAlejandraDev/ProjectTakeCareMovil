@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,7 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.User
-import com.example.takecare.ui.Utils.convertMillisToDate
+import com.example.takecare.ui.components.DialogComponent
 import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.register.components.ContactDataFrame
 import com.example.takecare.ui.screens.register.components.EmergencyDataFrame
@@ -48,7 +47,6 @@ fun RegisterScreen(
     var name by remember { mutableStateOf("") }
     var firstLastName by remember { mutableStateOf("") }
     var secondLastName by remember { mutableStateOf("") }
-    var bornDate by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -59,7 +57,6 @@ fun RegisterScreen(
     var city by remember { mutableStateOf("") }
     var emergencyContact by remember { mutableStateOf("") }
 
-    var bornDatePicked by remember { mutableStateOf<Long?>(null) }
 
     val totalSteps = 4
     var currentStep by remember { mutableStateOf(0) }
@@ -67,6 +64,9 @@ fun RegisterScreen(
         targetValue = (currentStep + 1) / totalSteps.toFloat(),
         animationSpec = tween(600)
     )
+
+    var showDialog by remember { mutableStateOf(false) }
+    var isUserCreated by remember { mutableStateOf(false) }
 
     fun createNewUser() {
         val newUser = User(
@@ -91,7 +91,14 @@ fun RegisterScreen(
             userId = 0,
         )
 
-        registerViewModel.createNewUser(newPatient)
+        registerViewModel.createNewUser(newPatient) { isSuccess ->
+            showDialog = true
+            if (isSuccess) {
+                isUserCreated = true
+            } else {
+                isUserCreated = false
+            }
+        }
     }
 
     Scaffold(
@@ -171,8 +178,6 @@ fun RegisterScreen(
                         { firstLastName = it },
                         secondLastName,
                         { secondLastName = it },
-                        bornDate = bornDatePicked,
-                        { bornDate = convertMillisToDate(it) },
                         gender,
                         { gender = it }
                     )
@@ -202,6 +207,14 @@ fun RegisterScreen(
                         { emergencyContact = it }
                     )
                 }
+            }
+            if (showDialog) {
+                DialogComponent(
+                    title = if (isUserCreated) "Usuario creado" else "No se pudo crear el usuario",
+                    message = if (isUserCreated) "Tu cuenta se ha registrado correctamente. ¡Bienvenido!"
+                    else "Ocurrió un problema al registrar tu cuenta. Por favor, inténtalo nuevamente más tarde.",
+                    confirmText = "Entendido",
+                    onConfirm = { showDialog = false })
             }
         }
     }

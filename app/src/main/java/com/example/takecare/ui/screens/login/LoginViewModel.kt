@@ -27,7 +27,7 @@ class LoginViewModel : ViewModel() {
     private val _isTokenSaved = MutableStateFlow<Boolean>(false)
     val isTokenSaved : StateFlow<Boolean> = _isTokenSaved
 
-    fun loginUser(email: String, password: String, context: Context) {
+    fun loginUser(email: String, password: String, context: Context, onResponse: (Boolean) -> Unit) {
         viewModelScope.launch {
             val sessionManager = SessionManager(context)
             try {
@@ -40,14 +40,17 @@ class LoginViewModel : ViewModel() {
                         userName = body.user.name,
                         email = body.user.email,
                     )
+                    onResponse(true)
                     Log.i("TOKENGUARDADO", body.token)
                     _loginSuccess.value = true
                 } else {
                     _loginSuccess.value = false
+                    onResponse(false)
                 }
             } catch (e: Exception) {
                 Log.e("LOGIN_ERROR", e.message.toString())
                 _loginSuccess.value = false
+                onResponse(false)
             }
         }
     }

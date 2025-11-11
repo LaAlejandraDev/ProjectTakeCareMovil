@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.integerResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
@@ -97,7 +98,7 @@ class ForumViewModel : ViewModel() {
         }
     }
 
-    fun addPost(post: PostModelCreate) {
+    fun addPost(post: PostModelCreate, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerForum.addPost(post)
@@ -107,6 +108,7 @@ class ForumViewModel : ViewModel() {
                         "Código: ${response.code()} | Cuerpo: ${response.body()} | Mensaje: ${response.message()}"
                     )
                     _uiEvent.emit(UIEvent.Showsnackbar("Se creó el post con éxito"))
+                    onResult(true)
                 } else {
                     val errorBody = response.errorBody()?.string()
                     Log.e(
@@ -114,10 +116,12 @@ class ForumViewModel : ViewModel() {
                         "Error ${response.code()} | Mensaje: ${response.message()} | Cuerpo de error: $errorBody"
                     )
                     _uiEvent.emit(UIEvent.Showsnackbar("Error al agregar el post: ${response.code()}"))
+                    onResult(false)
                 }
             } catch (e: Exception) {
                 Log.e("POSTCREATION_EXCEPTION", "Excepción: ${e.message}", e)
                 _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor: ${e.message}"))
+                onResult(false)
             }
         }
     }
@@ -166,7 +170,7 @@ class ForumViewModel : ViewModel() {
         }
     }
 
-    fun responsePost(comment: CreateComment) {
+    fun responsePost(comment: CreateComment, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerComments.addComment(comment)
@@ -175,15 +179,18 @@ class ForumViewModel : ViewModel() {
                     val postResponse = response.body()
                     Log.i("COMMENT_POST", "Comentario agregado correctamente: $postResponse")
                     _uiEvent.emit(UIEvent.Showsnackbar("Comentario agregado correctamente"))
+                    onResult(true)
                 } else {
                     val errorBody = response.errorBody()?.string()
                     Log.e("COMMENT_POST", "Error ${response.code()} al enviar comentario: $errorBody")
                     _uiEvent.emit(UIEvent.Showsnackbar("Error al responder el post (${response.code()})"))
+                    onResult(false)
                 }
 
             } catch (e: Exception) {
                 Log.e("COMMENT_POST", "Excepción al enviar comentario: ${e.message}", e)
                 _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor: ${e.localizedMessage ?: "desconocido"}"))
+                onResult(false)
             }
         }
     }

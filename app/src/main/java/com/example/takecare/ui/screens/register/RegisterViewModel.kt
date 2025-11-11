@@ -8,7 +8,7 @@ import com.example.takecare.data.models.PatientModel
 import kotlinx.coroutines.launch
 
 class RegisterViewModel : ViewModel() {
-    fun createNewUser(user: PatientModel) {
+    fun createNewUser(user: PatientModel, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
                 Log.d("USERPOST", "Iniciando creación de usuario...")
@@ -23,16 +23,19 @@ class RegisterViewModel : ViewModel() {
                     val responseBody = response.body()
                     Log.i("USERPOST", "✅ Usuario creado correctamente.")
                     Log.i("USERPOST", "Respuesta del servidor: ${responseBody}")
+                    onResult(true)
                 } else {
                     val errorBody = response.errorBody()?.string()
                     Log.e("USERPOST", "❌ Error al crear usuario.")
                     Log.e("USERPOST", "Código HTTP: ${response.code()}")
                     Log.e("USERPOST", "Mensaje: ${response.message()}")
                     Log.e("USERPOST", "ErrorBody: ${errorBody ?: "Sin cuerpo de error"}")
+                    onResult(false)
                 }
             } catch (e: Exception) {
                 Log.e("USERPOST", "💥 Excepción al crear usuario: ${e.localizedMessage}")
                 e.printStackTrace()
+                onResult(false)
             }
         }
     }
