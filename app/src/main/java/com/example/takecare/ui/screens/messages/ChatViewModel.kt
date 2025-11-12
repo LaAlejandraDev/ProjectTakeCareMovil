@@ -11,6 +11,7 @@ import com.example.takecare.data.models.Insert.ChatModel
 import com.example.takecare.data.models.Insert.MessageModelCreate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ChatViewModel : ViewModel() {
@@ -35,7 +36,9 @@ class ChatViewModel : ViewModel() {
                     readed = false,
                     date = ""
                 )
-                _chatMessagesData.value += newMsg
+                _chatMessagesData.update { oldList ->
+                    oldList + newMsg
+                }
             }
         }
     }

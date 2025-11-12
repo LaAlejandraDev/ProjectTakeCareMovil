@@ -10,7 +10,10 @@ object SignalRManager {
     private const val HUB_URL = "http://192.168.0.107:5002/chathub"
     private var hubConnection: HubConnection? = null
 
-    private val _messages = MutableSharedFlow<Pair<String, String>>(replay = 0)
+    private val _messages = MutableSharedFlow<Pair<String, String>>(
+        replay = 1,
+        extraBufferCapacity = 1
+    )
     val messages = _messages.asSharedFlow()
 
     fun startConnection() {
@@ -23,12 +26,10 @@ object SignalRManager {
             _messages.tryEmit(user to message)
         }, String::class.java, String::class.java)
 
-        try {
-            hubConnection?.start()?.blockingAwait()
-            Log.i("SIGNALR", "Conectado al servidor SignalR")
-        } catch (e: Exception) {
-            Log.e("SIGNALR", "Error al conectar: ${e.message}")
-        }
+        hubConnection?.start()
+            ?.doOnComplete { Log.i("SIGNALR", "Conectado al servidor SignalR") }
+            ?.doOnError { e -> Log.e("SIGNALR", "Error al conectar: ${e.message}") }
+            ?.subscribe()
     }
 
     fun sendMessage(senderId: Int, message: String) {
