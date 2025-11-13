@@ -16,8 +16,6 @@ import com.example.takecare.data.models.Insert.MessageModelCreate
 import com.example.takecare.ui.screens.forum.components.OpenPostBottomBar
 import com.example.takecare.ui.screens.messages.components.MessageComponent
 import com.example.takecare.ui.screens.messages.components.TopBarChat
-import com.microsoft.signalr.HubConnection
-import com.microsoft.signalr.HubConnectionBuilder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -29,13 +27,9 @@ fun ChatScreen(
 ) {
     var newMessage by remember { mutableStateOf("") }
     val chatMessages by chatViewModel.chatMessagesData.collectAsState()
-
+    val chatInfo by chatViewModel.chatInfo.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
-    val chatInfo = chatViewModel.chatInfo.collectAsState()
-
-    val currentUserId = chatViewModel.chatData.value?.idPatient ?: -1
 
     LaunchedEffect(Unit) {
         chatViewModel.connectSignalR()
@@ -46,25 +40,44 @@ fun ChatScreen(
         }
     }
 
-    fun sendMessage() {
-        if (newMessage.isBlank()) return
-        chatViewModel.sendSignalRMessage(currentUserId, newMessage)
-
-        val msg = MessageModelCreate(chatId!!.toInt(), currentUserId, newMessage, true)
-        chatViewModel.createNewMessage(msg) { success ->
-            if (success) {
-                coroutineScope.launch {
-                    delay(100)
-                    listState.animateScrollToItem(chatMessages.size - 1)
-                }
+    LaunchedEffect(chatMessages.size) {
+        if (chatMessages.isNotEmpty()) {
+            coroutineScope.launch {
+                delay(100)
+                listState.animateScrollToItem(chatMessages.size - 1)
             }
         }
+    }
+
+    fun sendMessage() {
+        if (newMessage.isBlank() || chatInfo == null || chatId == null) return
+
+        val idSender = chatInfo?.idPatient
+
+        val messageToSend = MessageModelCreate(
+            chatId = chatId.toInt(),
+            senderUserId = idSender!!,
+            message = newMessage,
+            isRead = true
+        )
+
+        Log.i("CHAT_SEND", "Intentando enviar mensaje: $messageToSend")
+
+        chatViewModel.createNewMessage(messageToSend) { success ->
+            if (success) {
+                Log.i("CHAT_SEND", "Mensaje creado en la base de datos. Enviando por SignalR...")
+                chatViewModel.sendSignalRMessage(messageToSend)
+            } else {
+                Log.e("CHAT_SEND", "Error al crear el mensaje en la base de datos. No se enviará por SignalR.")
+            }
+        }
+
         newMessage = ""
     }
 
     Scaffold(
         topBar = {
-            chatInfo.value?.let {
+            chatInfo?.let {
                 TopBarChat(navController, it)
             }
         },
@@ -96,7 +109,7 @@ fun ChatScreen(
                     items(chatMessages) { msg ->
                         MessageComponent(
                             message = msg.message,
-                            owner = msg.senderId == currentUserId
+                            owner = msg.senderId == chatInfo?.idPatient
                         )
                     }
                 }

@@ -15,119 +15,109 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ChatViewModel : ViewModel() {
+
     private val _chatData = MutableStateFlow<ChatModel?>(null)
-    val chatData : StateFlow<ChatModel?> = _chatData
+    val chatData: StateFlow<ChatModel?> = _chatData
 
     private val _chatMessagesData = MutableStateFlow<List<MessageAllDataModel>>(emptyList())
-    val chatMessagesData : StateFlow<List<MessageAllDataModel>> = _chatMessagesData
+    val chatMessagesData: StateFlow<List<MessageAllDataModel>> = _chatMessagesData
 
     private val _chatInfo = MutableStateFlow<ChatAllDataModel?>(null)
-    val chatInfo : StateFlow<ChatAllDataModel?> = _chatInfo
+    val chatInfo: StateFlow<ChatAllDataModel?> = _chatInfo
 
 
     init {
         viewModelScope.launch {
-            SignalRManager.messages.collect { (user, message) ->
-                val newMsg = MessageAllDataModel(
-                    id = -1,
-                    chatId = 0,
-                    senderId = user.toIntOrNull() ?: 0,
-                    message = message,
-                    readed = false,
-                    date = ""
-                )
-                _chatMessagesData.update { oldList ->
-                    oldList + newMsg
-                }
+            SignalRManager.messages.collect { newMsg ->
+                Log.i("SIGNALR_RECEIVED", "Nuevo mensaje recibido: ${newMsg.message}")
+                _chatMessagesData.update { oldList -> oldList + newMsg }
             }
         }
     }
 
     fun connectSignalR() {
+        Log.i("SIGNALR", "Intentando conectar a SignalR...")
         SignalRManager.startConnection()
     }
 
-    fun sendSignalRMessage(senderId: Int, message: String) {
-        SignalRManager.sendMessage(senderId, message)
-    }
-
-    fun setChatMessages(newMessages: List<MessageAllDataModel>) {
-        _chatMessagesData.value = newMessages
+    fun sendSignalRMessage(message: MessageModelCreate) {
+        Log.i("SIGNALR_SEND", "Enviando mensaje por SignalR: $message")
+        SignalRManager.sendMessage(message)
     }
 
     fun getChatInfo(chatId: Int) {
-        Log.i("CHAT_GET","ID recolectado: $chatId")
+        Log.i("CHAT_INFO", "Obteniendo info del chat ID: $chatId")
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerChats.getChatInfo(chatId)
                 if (response.isSuccessful) {
-                    val chatData = response.body()
-                    Log.i("CHAT_INFO","El chat se cargo de manera correcta")
-                    _chatInfo.value = chatData
+                    _chatInfo.value = response.body()
+                    Log.i("CHAT_INFO_SUCCESS", "Chat info cargada correctamente")
                 } else {
-                    Log.e("CHAT_INFO_ERROR","Error al cargar el chat")
+                    Log.e("CHAT_INFO_ERROR", "Error al cargar info del chat: ${response.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("CHAT_INFO_SERVER_ERROR","Error de servidor")
+                Log.e("CHAT_INFO_EXCEPTION", "Error de servidor: ${e.message}")
             }
         }
     }
 
     fun getChatData(chatId: Int) {
-        Log.i("CHAT_GET","ID recolectado: $chatId")
+        Log.i("CHAT_DATA", "Obteniendo datos del chat ID: $chatId")
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerChats.getChat(chatId)
                 if (response.isSuccessful) {
-                    val chatData = response.body()
-                    Log.i("CHAT_GET","El chat se cargo de manera correcta")
-                    _chatData.value = chatData
+                    _chatData.value = response.body()
+                    Log.i("CHAT_DATA_SUCCESS", "Chat cargado correctamente")
                 } else {
-                    Log.e("CHAT_ERROR","Error al cargar el chat")
+                    Log.e("CHAT_DATA_ERROR", "Error al cargar chat: ${response.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("CHAT_SERVER_ERROR","Error de servidor")
-            }
-        }
-    }
-
-    fun createNewMessage(
-        newMessage: MessageModelCreate,
-        onResult: (Boolean) -> Unit
-    ) {
-        viewModelScope.launch {
-            Log.i("MESSAGE_SEND", "MENSAJE: ${newMessage}")
-            try {
-                val response = RetrofitClient.ApiServerChats.postNewMessage(newMessage)
-                if (response.isSuccessful) {
-                    Log.i("MESSAGE_SEND", "El mensaje se envió correctamente")
-                    onResult(true)
-                } else {
-                    Log.e("MESSAGE_ERROR", "Error al enviar el mensaje: ${response.code()}")
-                    Log.e("MESSAGE_ERROR_BODY", "BODY: ${response.errorBody()?.string()}")
-                    onResult(false)
-                }
-            } catch (e: Exception) {
-                Log.e("MESSAGE_ERROR", "Error de servidor: ${e.message}")
-                onResult(false)
+                Log.e("CHAT_DATA_EXCEPTION", "Error de servidor: ${e.message}")
             }
         }
     }
 
     fun getChatMessages(chatId: Int) {
+        Log.i("CHAT_MESSAGES", "Obteniendo mensajes del chat ID: $chatId")
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerChats.getChatMessages(chatId)
                 if (response.isSuccessful) {
-                    val list = response.body() ?: emptyList()
-                    Log.i("MESSAGE_LIST","Los mensajes se obtuvieron de manera correcta")
+                    val list = response.body().orEmpty()
                     _chatMessagesData.value = list
+                    Log.i("CHAT_MESSAGES_SUCCESS", "Mensajes obtenidos correctamente")
                 } else {
-                    Log.e("MESSAGE_LIST_ERROR","Error al obtener los mensajes del chat")
+                    Log.e("CHAT_MESSAGES_ERROR", "Error al obtener mensajes: ${response.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("MESSAGE_LIST_SERVER_ERROR","Error de servidor")
+                Log.e("CHAT_MESSAGES_EXCEPTION", "Error de servidor: ${e.message}")
             }
         }
+    }
+
+    fun createNewMessage(newMessage: MessageModelCreate, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            Log.i("MESSAGE_CREATE", "Creando nuevo mensaje: $newMessage")
+            try {
+                val response = RetrofitClient.ApiServerChats.postNewMessage(newMessage)
+                if (response.isSuccessful) {
+                    Log.i("MESSAGE_CREATE_SUCCESS", "Mensaje creado en la base de datos")
+                    onResult(true)
+                } else {
+                    Log.e("MESSAGE_CREATE_ERROR", "Error al crear mensaje: ${response.code()}")
+                    Log.e("MESSAGE_CREATE_BODY", "BODY: ${response.errorBody()?.string()}")
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                Log.e("MESSAGE_CREATE_EXCEPTION", "Error de servidor: ${e.message}")
+                onResult(false)
+            }
+        }
+    }
+
+    fun setChatMessages(newMessages: List<MessageAllDataModel>) {
+        _chatMessagesData.value = newMessages
     }
 }
