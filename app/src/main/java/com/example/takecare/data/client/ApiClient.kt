@@ -4,6 +4,7 @@ import com.example.takecare.data.interfaces.ApiChat
 import com.example.takecare.data.interfaces.ApiComments
 import com.example.takecare.data.interfaces.ApiForum
 import com.example.takecare.data.interfaces.ApiLogin
+import com.example.takecare.data.interfaces.ApiPsycologist
 import com.example.takecare.data.interfaces.ApiUsers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -49,5 +50,13 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiChat::class.java)
+    }
+
+    val ApiServerPsycologist: ApiPsycologist by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiPsycologist::class.java)
     }
 }

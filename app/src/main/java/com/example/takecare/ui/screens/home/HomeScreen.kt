@@ -13,12 +13,13 @@ import com.example.takecare.ui.screens.forum.ForumViewModel
 import com.example.takecare.ui.screens.home.components.AppScaffoldNavHost
 import com.example.takecare.ui.screens.messages.ChatScreen
 import com.example.takecare.ui.screens.psycologist.PsycoListScreen
+import com.example.takecare.ui.screens.psycologist.PsycologistInfoScreen
 
 @Composable
 fun HomeScreen() {
     val rootNavController = rememberNavController()
 
-    val forumViewModel : ForumViewModel = viewModel()
+    val forumViewModel: ForumViewModel = viewModel()
 
     NavHost(
         navController = rootNavController,
@@ -42,8 +43,18 @@ fun HomeScreen() {
             ChatScreen(navController = rootNavController, chatId = chatId)
         }
 
-        composable ("psyco_list") {
-            PsycoListScreen()
+        composable("psyco_list") {
+            PsycoListScreen(rootNavController)
+        }
+
+        composable(
+            route = "psyco_info/{psycoId}",
+            arguments = listOf(
+                navArgument("psycoId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val psycoId = backStackEntry.arguments?.getInt("psycoId")
+            PsycologistInfoScreen(psycologistId = psycoId)
         }
     }
 }
