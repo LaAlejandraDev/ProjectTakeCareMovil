@@ -200,7 +200,7 @@ fun PsycoListItem(
 
             OutlinedButton (
                 modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
-                onClick = { navController.navigate("psyco_info/${psycoData.id}") }
+                onClick = { navController.navigate("psyco_info/${psycoData.id}/${psycoData.speciality}") }
             ) {
                 Text("Reservar una cita", color = Color.Black)
             }

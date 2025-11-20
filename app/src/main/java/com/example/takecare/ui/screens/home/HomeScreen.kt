@@ -48,13 +48,15 @@ fun HomeScreen() {
         }
 
         composable(
-            route = "psyco_info/{psycoId}",
+            route = "psyco_info/{psycoId}/{name}",
             arguments = listOf(
-                navArgument("psycoId") { type = NavType.IntType }
+                navArgument("psycoId") { type = NavType.IntType },
+                navArgument("name") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val psycoId = backStackEntry.arguments?.getInt("psycoId")
-            PsycologistInfoScreen(psycologistId = psycoId)
+            val name = backStackEntry.arguments?.getString("name")
+            PsycologistInfoScreen(psycologistId = psycoId, psycologistName = name)
         }
     }
 }

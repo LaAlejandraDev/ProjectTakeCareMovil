@@ -57,7 +57,6 @@ class ForumViewModel : ViewModel() {
                     _userId.value = userId
                 }
             } catch (e: Exception) {
-                Log.i("TokenGuardado", "Error al obtener el id del usuario: $e")
             }
         }
     }
@@ -79,20 +78,16 @@ class ForumViewModel : ViewModel() {
     }
 
     fun openPostSelected(id: Int) {
-        Log.i("POSTINFO", "Se abrio el post")
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.ApiServerForum.getAPost(id)
                 if (response.isSuccessful) {
-                    Log.i("POSTGET", response.body().toString())
                     val postResponse = response.body()
                     _openPost.value = postResponse
                 } else {
-                    Log.e("POSTGET", response.body().toString())
                     _uiEvent.emit(UIEvent.Showsnackbar("Error al abrir el post " + response.code()))
                 }
             } catch (e: Exception) {
-                Log.i("POSTGET", e.message.toString())
                 _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor"))
             }
         }
@@ -103,23 +98,14 @@ class ForumViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.ApiServerForum.addPost(post)
                 if (response.isSuccessful) {
-                    Log.i(
-                        "POSTCREATION",
-                        "Código: ${response.code()} | Cuerpo: ${response.body()} | Mensaje: ${response.message()}"
-                    )
                     _uiEvent.emit(UIEvent.Showsnackbar("Se creó el post con éxito"))
                     onResult(true)
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    Log.e(
-                        "POSTCREATION_ERROR",
-                        "Error ${response.code()} | Mensaje: ${response.message()} | Cuerpo de error: $errorBody"
-                    )
                     _uiEvent.emit(UIEvent.Showsnackbar("Error al agregar el post: ${response.code()}"))
                     onResult(false)
                 }
             } catch (e: Exception) {
-                Log.e("POSTCREATION_EXCEPTION", "Excepción: ${e.message}", e)
                 _uiEvent.emit(UIEvent.Showsnackbar("Error de servidor: ${e.message}"))
                 onResult(false)
             }
@@ -128,8 +114,6 @@ class ForumViewModel : ViewModel() {
 
     fun getPostComments(id: Int) {
         viewModelScope.launch {
-            Log.i("GETCOMMENTS", "Iniciando solicitud para obtener comentarios del post con id=$id")
-
             try {
                 val response = RetrofitClient.ApiServerComments.getPostCommets(id)
 
@@ -137,8 +121,6 @@ class ForumViewModel : ViewModel() {
                     val commentsList = response.body() ?: emptyList()
                     _postCommentsList.value = commentsList
 
-                    Log.i("GETCOMMENTS_SUCCESS", "✅ Comentarios obtenidos correctamente (${commentsList.size} encontrados)")
-                    Log.i("GETCOMMENTS_SUCCESS", "✅ BODY: ${response.body()}")
                     commentsList.forEachIndexed { index, comment ->
                         Log.d("GETCOMMENTS_ITEM", "[$index] id=${comment.id}, contenido=${comment.content}, usuario=${comment.userId}")
                     }
@@ -150,7 +132,6 @@ class ForumViewModel : ViewModel() {
                     Log.e(
                         "GETCOMMENTS_ERROR",
                         """
-                    ❌ Error al obtener comentarios.
                     Código HTTP: ${response.code()}
                     Mensaje: ${response.message()}
                     Error body: $errorBody
@@ -159,11 +140,6 @@ class ForumViewModel : ViewModel() {
                 }
 
             } catch (e: Exception) {
-                Log.e(
-                    "GETCOMMENTS_EXCEPTION",
-                    "💥 Excepción al obtener comentarios: ${e.localizedMessage}",
-                    e
-                )
             } finally {
                 Log.i("GETCOMMENTS", "Finalizó la solicitud de comentarios para el post id=$id")
             }
