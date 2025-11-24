@@ -1,0 +1,81 @@
+package com.example.takecare.ui.screens.dairy
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.takecare.ui.navigation.HomeRoutes
+import com.example.takecare.ui.screens.dairy.sections.DiaryConfirmationSection
+import com.example.takecare.ui.screens.dairy.sections.DiaryWriteSection
+import com.example.takecare.ui.screens.dairy.sections.IntroductionSection
+import com.example.takecare.ui.screens.psycologist.AlertDialogError
+
+@Composable
+fun DiaryScreen(
+    navController: NavController,
+    viewModel: DiaryViewModel = viewModel()
+) {
+    var sectionIndex by remember { mutableStateOf(0) }
+    val openAlertDialog = remember { mutableStateOf(true) }
+    val dialogTitle = remember { mutableStateOf("Gracias por compartir tu día") }
+    val dialogContent = remember {
+        mutableStateOf(
+            "Tu diario de hoy está completo.\n" +
+                    "Mañana tendrás un nuevo espacio para seguir expresándote."
+        )
+    }
+
+    fun onNextSection() {
+        if (sectionIndex > -1 && sectionIndex < 3) {
+            sectionIndex++
+        }
+    }
+
+    fun onConfirm() {
+
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when {
+            openAlertDialog.value -> {
+                AlertDialogError(
+                    onConfirmation = {
+                        openAlertDialog.value = false
+                        navController.navigate(HomeRoutes.Home.route)
+                    },
+                    onDismissRequest = {
+                        openAlertDialog.value = false
+                        navController.navigate(HomeRoutes.Home.route)
+                    },
+                    dialogTitle = dialogTitle.value,
+                    dialogText = dialogContent.value
+                )
+            }
+
+            sectionIndex == 0 -> {
+                IntroductionSection({ onNextSection() })
+            }
+
+            sectionIndex == 1 -> {
+                DiaryWriteSection({ onNextSection() })
+            }
+
+            sectionIndex == 2 -> {
+                DiaryConfirmationSection({ onConfirm() })
+            }
+
+            else -> {
+                Text("Ocurrio un error")
+            }
+        }
+    }
+}

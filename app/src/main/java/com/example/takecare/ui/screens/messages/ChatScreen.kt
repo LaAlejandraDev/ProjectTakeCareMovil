@@ -16,6 +16,7 @@ import com.example.takecare.data.models.Insert.MessageModelCreate
 import com.example.takecare.ui.screens.forum.components.OpenPostBottomBar
 import com.example.takecare.ui.screens.messages.components.MessageComponent
 import com.example.takecare.ui.screens.messages.components.TopBarChat
+import com.example.takecare.ui.screens.psycologist.AlertDialogError
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -30,6 +31,7 @@ fun ChatScreen(
     val chatInfo by chatViewModel.chatInfo.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val openAlertDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         chatViewModel.connectSignalR()
@@ -64,11 +66,8 @@ fun ChatScreen(
         Log.i("CHAT_SEND", "Intentando enviar mensaje: $messageToSend")
 
         chatViewModel.createNewMessage(messageToSend) { success ->
-            if (success) {
-                Log.i("CHAT_SEND", "Mensaje creado en la base de datos. Enviando por SignalR...")
-                chatViewModel.sendSignalRMessage(messageToSend)
-            } else {
-                Log.e("CHAT_SEND", "Error al crear el mensaje en la base de datos. No se enviará por SignalR.")
+            if (!success) {
+                openAlertDialog.value = true
             }
         }
 
@@ -90,27 +89,44 @@ fun ChatScreen(
         }
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {
-            LazyColumn(
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)
-            ) {
-                if (chatMessages.isEmpty()) {
-                    item {
-                        Text(
-                            "No hay mensajes aún",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                    }
-                } else {
-                    items(chatMessages) { msg ->
-                        MessageComponent(
-                            message = msg.message,
-                            owner = msg.senderId == chatInfo?.idPatient
-                        )
+            when {
+                openAlertDialog.value -> {
+                    AlertDialogError(
+                        onConfirmation = {openAlertDialog.value = false},
+                        onDismissRequest = {openAlertDialog.value = false},
+                        dialogTitle = "Error",
+                        dialogText = "No se pudo enviar el mensaje, intentalo mas tarde"
+                    )
+                }
+
+                else -> {
+                    LazyColumn(
+                        state = listState,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(12.dp)
+                    ) {
+                        when {
+                            chatMessages.isEmpty() -> {
+                                item {
+                                    Text(
+                                        "No hay mensajes aún",
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                    )
+                                }
+                            }
+
+                            else -> {
+                                items(chatMessages) { msg ->
+                                    MessageComponent(
+                                        message = msg.message,
+                                        owner = msg.senderId == chatInfo?.idPatient
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

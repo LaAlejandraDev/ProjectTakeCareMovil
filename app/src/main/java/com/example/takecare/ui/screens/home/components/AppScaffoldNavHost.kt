@@ -31,6 +31,7 @@ import com.example.takecare.ui.Utils.UIEvent
 import com.example.takecare.ui.components.ButtonSize
 import com.example.takecare.ui.components.FloatingPostButton
 import com.example.takecare.ui.navigation.HomeRoutes
+import com.example.takecare.ui.screens.dairy.DiaryScreen
 import com.example.takecare.ui.screens.forum.ForumCreatePost
 import com.example.takecare.ui.screens.forum.ForumScreen
 import com.example.takecare.ui.screens.forum.ForumViewModel
@@ -105,7 +106,7 @@ fun AppScaffoldNavHost(rootNavController : NavController, forumViewModel: ForumV
         ) {
             composable(HomeRoutes.Home.route) { ForumScreen(forumViewModel, rootNavController) }
             composable(HomeRoutes.Messages.route) { MessagesScreen(rootNavController) }
-            //composable(HomeRoutes.Diary.route) { DiaryScreen() }
+            composable(HomeRoutes.Diary.route) { DiaryScreen(navController) }
             composable(HomeRoutes.Profile.route) { ProfileScreen(rootNavController) }
             composable(HomeRoutes.CreatePost.route) { ForumCreatePost() }
         }

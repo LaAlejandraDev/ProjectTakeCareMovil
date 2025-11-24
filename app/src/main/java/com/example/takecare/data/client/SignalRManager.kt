@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 object SignalRManager {
-    private const val HUB_URL = "http://192.168.0.107:5002/chatHub"
+    private const val HUB_URL = "http://10.0.2.2:5002/chatHub"
     private var hubConnection: HubConnection? = null
     private val gson = Gson()
 
