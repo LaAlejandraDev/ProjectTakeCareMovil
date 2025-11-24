@@ -22,6 +22,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.takecare.data.models.AllData.PsycologistWorkDaysAllData
 import com.example.takecare.data.models.Insert.DateModelCreate
 import com.example.takecare.ui.Utils.formatLocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -249,6 +251,9 @@ fun AgendaSheetContent(
 @Composable
 fun DayItem(data: PsycologistWorkDaysAllData, onNewDate: () -> Unit) {
     val disponible = data.currentDates < data.max
+    val workDayDate = LocalDateTime.parse(data.date)
+    val today = LocalDateTime.now()
+    val isAvailable = workDayDate.isBefore(today)
 
     Card(
         modifier = Modifier
@@ -276,12 +281,18 @@ fun DayItem(data: PsycologistWorkDaysAllData, onNewDate: () -> Unit) {
                 )
             }
 
-            IconButton(
-                onClick = { if (disponible) onNewDate() }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Agendar"
+            if (!isAvailable) {
+                IconButton(
+                    onClick = { if (disponible) onNewDate() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Agendar"
+                    )
+                }
+            } else {
+                Text(
+                    text = "No disponible"
                 )
             }
         }

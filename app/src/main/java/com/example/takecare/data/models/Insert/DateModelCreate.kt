@@ -1,6 +1,8 @@
 package com.example.takecare.data.models.Insert
 
 import com.google.gson.annotations.SerializedName
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 data class DateModelCreate(
     @SerializedName("id")
@@ -29,4 +31,14 @@ data class DateModelCreate(
 
     @SerializedName("ubicacion")
     val location: String
-)
+) {
+    fun isStartDateExpired(): Boolean {
+        return try {
+            val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            val start = LocalDateTime.parse(startDate, formatter)
+            start.isBefore(LocalDateTime.now())
+        } catch (e: Exception) {
+            false
+        }
+    }
+}

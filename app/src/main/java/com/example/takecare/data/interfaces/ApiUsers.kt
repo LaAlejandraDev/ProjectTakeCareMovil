@@ -1,5 +1,6 @@
 package com.example.takecare.data.interfaces
 
+import com.example.takecare.data.models.Insert.DateModelCreate
 import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.RegisterUserModel
 import com.example.takecare.data.models.User
@@ -25,4 +26,7 @@ interface ApiUsers {
     suspend fun getPatient(@Path("id") id: Int): Response<PatientModel>
     @PUT("Pacientes/{id}")
     suspend fun updatePatient(@Path("id") id: Int, @Body patientModel: PatientModel): Response<PatientModel>
+
+    @GET("Citas/paciente/{idPatient}")
+    suspend fun getPatientDates(@Path("idPatient") id: Int): Response<List<DateModelCreate>>
 }

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
+import com.example.takecare.data.models.Insert.DateModelCreate
 import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.User
 import com.example.takecare.ui.Utils.SessionManager
@@ -24,6 +25,9 @@ class ProfileViewModel : ViewModel() {
 
     private val _isUpdating = MutableStateFlow(false)
     val isUpdating: StateFlow<Boolean> = _isUpdating
+
+    private val _patientDateList = MutableStateFlow<List<DateModelCreate>>(emptyList())
+    val patientDateList : StateFlow<List<DateModelCreate>> = _patientDateList
     fun selectUser(context: Context) {
         viewModelScope.launch {
             val sessionManager = SessionManager(context)
@@ -57,8 +61,6 @@ class ProfileViewModel : ViewModel() {
                     val response = RetrofitClient.ApiServerUsers.getPatient(idUser)
                     if (response.isSuccessful) {
                         _selectedPatient.value = response.body()
-                        Log.i("GET_PATIENT", "Valores obtenidos " + response.body())
-                        Log.i("GET_PATIENT", "Se obtuvo el usuario con exito ")
                     } else {
                         Log.e("GET_PATIENT", "Error al obtener el usuario " + response.message())
                     }
@@ -91,6 +93,29 @@ class ProfileViewModel : ViewModel() {
         viewModelScope.launch {
             val sessionManager = SessionManager(context)
             sessionManager.clearSession()
+        }
+    }
+
+    fun getPatientDatesList(onResult: (Boolean) -> Unit) {
+        var idPatient: Int = -1
+        viewModelScope.launch {
+            try {
+                selectedPatient.value?.let { item ->
+                    idPatient = item.id ?: 0
+                }
+                val response = RetrofitClient.ApiServerUsers.getPatientDates(idPatient)
+                Log.d("PATIENT_DATES_LIST", "Estatus: ${response.code()}")
+                Log.d("PATIENT_DATES_LIST", "ID: ${idPatient}")
+                if (response.isSuccessful) {
+                    val data = response.body() ?: emptyList()
+                    _patientDateList.value = data
+                    onResult(true)
+                } else {
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                onResult(false)
+            }
         }
     }
 }

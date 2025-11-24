@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 object SignalRManager {
-    private const val HUB_URL = "http://10.0.2.2:5002/chatHub"
+    private const val HUB_URL = "http://192.168.0.107:5002/chatHub"
     private var hubConnection: HubConnection? = null
     private val gson = Gson()
 
@@ -29,8 +29,6 @@ object SignalRManager {
             try {
                 val jsonStr = gson.toJson(messageJson)
                 val message = gson.fromJson(jsonStr, MessageAllDataModel::class.java)
-
-                Log.i("SIGNALR", "Mensaje recibido: ${message.senderId} -> ${message.message}")
                 _messages.tryEmit(message)
             } catch (e: Exception) {
                 Log.e("SIGNALR", "Error al deserializar mensaje: ${e.message}")
@@ -46,7 +44,6 @@ object SignalRManager {
     fun sendMessage(message: MessageModelCreate) {
         try {
             hubConnection?.send("SendMessage", message)
-            Log.i("SIGNALR", "Mensaje enviado por SignalR: $message")
         } catch (e: Exception) {
             Log.e("SIGNALR", "Error al enviar mensaje: ${e.message}")
         }
