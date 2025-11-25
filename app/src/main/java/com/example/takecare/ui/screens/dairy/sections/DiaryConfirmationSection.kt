@@ -26,26 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.composeunstyled.Text
-
-sealed class DiaryState {
-    object Loading : DiaryState()
-    object Success : DiaryState()
-    object Error : DiaryState()
-}
-
+import com.example.takecare.ui.screens.dairy.DiaryState
 
 @Composable
 fun DiaryConfirmationSection(
+    diaryState: DiaryState,
     onConfirm: () -> Unit
 ) {
-    var state by remember { mutableStateOf<DiaryState>(DiaryState.Loading) }
-
-    // Simulación de carga
-    LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(2000)
-        state = DiaryState.Success
-    }
-
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -53,13 +40,14 @@ fun DiaryConfirmationSection(
     ) {
 
         AnimatedContent(
-            targetState = state,
+            targetState = diaryState,
             transitionSpec = { fadeIn() togetherWith fadeOut() }
-        ) { currentState ->
-            when (currentState) {
-                DiaryState.Loading -> LoadingResponse()
-                DiaryState.Success -> LoadingResponseSuccess(onConfirm)
-                DiaryState.Error -> LoadingResponseError()
+        ) { state ->
+            when (state) {
+                is DiaryState.Loading -> LoadingResponse()
+                is DiaryState.Success -> LoadingResponseSuccess(onConfirm)
+                is DiaryState.Error -> LoadingResponseError()
+                else -> Unit
             }
         }
     }

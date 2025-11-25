@@ -21,6 +21,8 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,21 +34,86 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.composeunstyled.Text
+import com.example.takecare.data.models.AllData.DiaryAllDataModel
 import com.example.takecare.data.models.Insert.DateModelCreate
 import com.example.takecare.ui.screens.profile.components.DialogValue
+import java.time.LocalDate
 
 @Composable
 fun UserDatesListSection(
-    patientDatesList: List<DateModelCreate> = emptyList()
+    patientDatesList: List<DateModelCreate> = emptyList(),
+    diaryList: List<DiaryAllDataModel> = emptyList()
 ) {
+    var selectedTab by remember { mutableStateOf(0) }
+    val pendingDates = patientDatesList.filter { !it.isStartDateExpired() }
+    val finishedDates = patientDatesList.filter { it.isStartDateExpired() }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
     ) {
-        when {
-            patientDatesList.isNotEmpty() -> {
-                DateListSection(patientDatesList)
+
+        TabRow(
+            selectedTabIndex = selectedTab,
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) {
+            Tab(
+                selected = selectedTab == 0,
+                onClick = { selectedTab = 0 },
+                text = { Text("Pendientes") }
+            )
+
+            Tab(
+                selected = selectedTab == 1,
+                onClick = { selectedTab = 1 },
+                text = { Text("Terminadas") }
+            )
+
+            Tab(
+                selected = selectedTab == 2,
+                onClick = { selectedTab = 2 },
+                text = { Text("Diario") }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        when (selectedTab) {
+            0 -> {
+                if (pendingDates.isEmpty()) {
+                    Text(
+                        "No tienes citas pendientes.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    DateListSection(patientDatesList = pendingDates)
+                }
+            }
+
+            1 -> {
+                if (finishedDates.isEmpty()) {
+                    Text(
+                        "No tienes citas terminadas.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    DateListSectionFinished(patientDatesList = finishedDates)
+                }
+            }
+
+            2 -> {
+                if (diaryList.isEmpty()) {
+                    Text(
+                        "No tienes un diario registrado.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    UserDiaryRegistryScreen(diaryList)
+                }
             }
         }
     }
@@ -56,17 +123,20 @@ fun UserDatesListSection(
 private fun DateListSection(
     patientDatesList: List<DateModelCreate> = emptyList()
 ) {
-    var showDialog by remember { mutableStateOf(false) }
-    var idSelected by remember { mutableStateOf(-1) }
+    val today = remember { LocalDate.now() }
 
-    fun onPressedDate(id: Int) {
-        showDialog = true
-        idSelected = id
-        Log.d("ID_DATE", "ID: $id")
+    val todayDates = patientDatesList.filter { date ->
+        val localDate = runCatching {
+            LocalDate.parse(date.startDate.substring(0, 10))
+        }.getOrNull()
+        localDate == today
     }
 
-    fun sendRating(rating: Int) {
-        //TODO: Enviar la calificacion al psicologo
+    val upcomingDates = patientDatesList.filter { date ->
+        val localDate = runCatching {
+            LocalDate.parse(date.startDate.substring(0, 10))
+        }.getOrNull()
+        localDate != null && localDate.isAfter(today)
     }
 
     Column(
@@ -74,28 +144,85 @@ private fun DateListSection(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            "Valora tus citas",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            "Citas para este dia",
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
         )
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            item {
-                when {
-                    showDialog -> {
-                        DialogValue(
-                            onDismissRequest = { showDialog = false },
-                            onConfirm = { rating ->
-                                showDialog = false
-                            }
-                        )
+
+        if (todayDates.isEmpty()) {
+            Text(
+                "No tienes citas para hoy.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        } else {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(todayDates) { item ->
+                    DateListItem(item) {
+                        // No hacer nada por ahora
                     }
+                }
+            }
+        }
+        Text(
+            "Próximas citas",
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+        )
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            if (upcomingDates.isEmpty()) {
+                item {
+                    Text(
+                        "No tienes próximas citas.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                items(upcomingDates) { item ->
+                    DateListItem(item) {
+                        // No hacer nada por ahora
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DateListSectionFinished(
+    patientDatesList: List<DateModelCreate> = emptyList()
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    var idSelected by remember { mutableStateOf(-1) }
+
+    fun onPressedDate(id: Int) {
+        showDialog = true
+        idSelected = id
+    }
+
+    fun sendRating(rating: Int) {
+        //TODO: Enviar la calificacion al psicologo
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            item {
+                if (showDialog) {
+                    DialogValue(
+                        onDismissRequest = { showDialog = false },
+                        onConfirm = { rating ->
+                            sendRating(rating)
+                            showDialog = false
+                        }
+                    )
                 }
             }
 
             items(patientDatesList) { item ->
                 DateListItem(item) { id ->
                     onPressedDate(id)
+                    showDialog = true
                 }
             }
         }

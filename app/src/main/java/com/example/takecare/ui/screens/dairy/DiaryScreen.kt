@@ -4,27 +4,34 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.takecare.data.models.Insert.DiaryInsertModel
 import com.example.takecare.ui.navigation.HomeRoutes
 import com.example.takecare.ui.screens.dairy.sections.DiaryConfirmationSection
 import com.example.takecare.ui.screens.dairy.sections.DiaryWriteSection
 import com.example.takecare.ui.screens.dairy.sections.IntroductionSection
 import com.example.takecare.ui.screens.psycologist.AlertDialogError
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun DiaryScreen(
     navController: NavController,
     viewModel: DiaryViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     var sectionIndex by remember { mutableStateOf(0) }
-    val openAlertDialog = remember { mutableStateOf(true) }
+    val openAlertDialog = remember { mutableStateOf(false) }
+    var text by remember { mutableStateOf("") }
     val dialogTitle = remember { mutableStateOf("Gracias por compartir tu día") }
+    val patient = viewModel.selectedPatient.collectAsState().value
     val dialogContent = remember {
         mutableStateOf(
             "Tu diario de hoy está completo.\n" +
@@ -38,8 +45,21 @@ fun DiaryScreen(
         }
     }
 
-    fun onConfirm() {
+    fun onCreateNewDiary() {
+        if (!text.isEmpty()) {
+            onNextSection()
+            val newDiary = DiaryInsertModel(
+                patient?.id!!,
+                0,
+                "",
+                text
+            )
+            viewModel.createNewDiary(newDiary)
+        }
+    }
 
+    LaunchedEffect(Unit) {
+        viewModel.getPatient(context)
     }
 
     Box(
@@ -66,11 +86,13 @@ fun DiaryScreen(
             }
 
             sectionIndex == 1 -> {
-                DiaryWriteSection({ onNextSection() })
+                DiaryWriteSection(text = text, onValueChange = { text = it }, { onCreateNewDiary() })
             }
 
             sectionIndex == 2 -> {
-                DiaryConfirmationSection({ onConfirm() })
+                DiaryConfirmationSection(
+                    diaryState = viewModel.diaryState.collectAsState().value,
+                    {  })
             }
 
             else -> {

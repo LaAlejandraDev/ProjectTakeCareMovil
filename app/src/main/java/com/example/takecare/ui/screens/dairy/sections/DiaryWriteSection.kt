@@ -17,10 +17,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DiaryWriteSection(
+    text: String,
+    onValueChange: (String) -> Unit,
     onSave: () -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +69,7 @@ fun DiaryWriteSection(
 
             BasicTextField(
                 value = text,
-                onValueChange = { text = it },
+                onValueChange = { onValueChange(it) },
                 textStyle = TextStyle(
                     color = Color(0xFF3A3A3A),
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize,

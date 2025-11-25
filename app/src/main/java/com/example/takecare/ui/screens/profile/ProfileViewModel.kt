@@ -104,8 +104,6 @@ class ProfileViewModel : ViewModel() {
                     idPatient = item.id ?: 0
                 }
                 val response = RetrofitClient.ApiServerUsers.getPatientDates(idPatient)
-                Log.d("PATIENT_DATES_LIST", "Estatus: ${response.code()}")
-                Log.d("PATIENT_DATES_LIST", "ID: ${idPatient}")
                 if (response.isSuccessful) {
                     val data = response.body() ?: emptyList()
                     _patientDateList.value = data

@@ -1,8 +1,9 @@
 package com.example.takecare.data.interfaces
 
+import com.example.takecare.data.models.AllData.DiaryAllDataModel
+import com.example.takecare.data.models.Insert.DiaryInsertModel
 import com.example.takecare.data.models.Insert.DateModelCreate
 import com.example.takecare.data.models.PatientModel
-import com.example.takecare.data.models.RegisterUserModel
 import com.example.takecare.data.models.User
 import retrofit2.Response
 import retrofit2.http.Body
@@ -10,7 +11,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface ApiUsers {
     @GET("Usuarios")
@@ -29,4 +29,10 @@ interface ApiUsers {
 
     @GET("Citas/paciente/{idPatient}")
     suspend fun getPatientDates(@Path("idPatient") id: Int): Response<List<DateModelCreate>>
+
+    @POST("DiarioEmocionals")
+    suspend fun createNewDiary(@Body newDiary: DiaryInsertModel): Response<DiaryAllDataModel>
+
+    @GET("DiarioEmocionals/paciente/{idPaciente}")
+    suspend fun getDiaryList(@Path("idPaciente") id: Int): Response<List<DiaryAllDataModel>>
 }

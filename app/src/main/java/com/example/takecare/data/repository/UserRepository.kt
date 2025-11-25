@@ -1,7 +1,9 @@
 package com.example.takecare.data.repository
 
 import com.example.takecare.data.interfaces.ApiUsers
+import com.example.takecare.data.models.AllData.DiaryAllDataModel
 import com.example.takecare.data.models.Insert.DateModelCreate
+import com.example.takecare.data.models.Insert.DiaryInsertModel
 import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.User
 import retrofit2.Response
@@ -29,5 +31,13 @@ class UserRepository(private val apiUsers: ApiUsers) {
 
     suspend fun getPatientDates(id: Int): Response<List<DateModelCreate>> {
         return apiUsers.getPatientDates(id)
+    }
+
+    suspend fun createNewDiary(newDiary: DiaryInsertModel): Response<DiaryAllDataModel> {
+        return apiUsers.createNewDiary(newDiary)
+    }
+
+    suspend fun getDiaryList(id: Int): Response<List<DiaryAllDataModel>> {
+        return apiUsers.getDiaryList(id)
     }
 }
