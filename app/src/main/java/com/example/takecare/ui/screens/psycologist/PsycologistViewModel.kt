@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
 import com.example.takecare.data.models.AllData.PsycologistAllData
 import com.example.takecare.data.models.AllData.PsycologistWorkDaysAllData
+import com.example.takecare.data.models.Insert.ChatModel
+import com.example.takecare.data.models.Insert.CreateChat
 import com.example.takecare.data.models.Insert.DateModelCreate
 import com.example.takecare.ui.Utils.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -130,6 +132,32 @@ class PsycologistViewModel : ViewModel() {
 
                 e.printStackTrace()
 
+                onResponse(false)
+            }
+        }
+    }
+
+    fun createNewChat(chatModel: CreateChat, onResponse: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            Log.d("CreateChat", "Iniciando creación de chat...")
+            Log.d("CreateChat", "Datos enviados: $chatModel")
+
+            try {
+                val response = RetrofitClient.ApiServerPsycologist.createNewChat(chatModel)
+
+                Log.d("CreateChat", "Código HTTP: ${response.code()}")
+
+                if (response.isSuccessful) {
+                    Log.d("CreateChat", "Chat creado correctamente: ${response.body()}")
+                    onResponse(true)
+                } else {
+                    Log.e("CreateChat", "Error al crear chat: ${response.errorBody()?.string()}")
+                    onResponse(false)
+                }
+
+            } catch (e: Exception) {
+                Log.e("CreateChat", "Excepción al crear chat: ${e.localizedMessage}")
+                e.printStackTrace()
                 onResponse(false)
             }
         }

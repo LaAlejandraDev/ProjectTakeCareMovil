@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -38,6 +41,7 @@ import com.example.takecare.data.models.Insert.PostModelCreate
 import com.example.takecare.data.models.Post
 import com.example.takecare.data.models.PostType
 import com.example.takecare.ui.components.DialogComponent
+import com.example.takecare.ui.components.DialogSimple
 import com.example.takecare.ui.screens.profile.ProfileViewModel
 import java.time.Instant
 
@@ -52,6 +56,7 @@ fun ForumCreatePost(forumViewModel: ForumViewModel = viewModel(), profileViewMod
     val isoDate = Instant.now().toString()
     var showDialog by remember { mutableStateOf(false) }
     var isPostCreated by remember { mutableStateOf(false) }
+    var validationError by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         profileViewModel.selectUser(context)
@@ -77,7 +82,7 @@ fun ForumCreatePost(forumViewModel: ForumViewModel = viewModel(), profileViewMod
                 }
             }
         } else {
-            Log.e("USERERROR", "No se pudo crear el post")
+            validationError = true
         }
     }
 
@@ -159,12 +164,28 @@ fun ForumCreatePost(forumViewModel: ForumViewModel = viewModel(), profileViewMod
             }
 
             if (showDialog) {
-                DialogComponent(
+                DialogSimple(
                     title = if (isPostCreated) "Publicación creada" else "No se pudo crear la publicación",
-                    message = if (isPostCreated) "Tu publicación se ha creado correctamente y ya está disponible."
+                    text = if (isPostCreated) "Tu publicación se ha creado correctamente y ya está disponible."
                     else "Ocurrió un problema al crear tu publicación. Por favor, inténtalo de nuevo más tarde.",
-                    confirmText = "Entendido",
-                    onConfirm = { showDialog = false })
+                    icon = if (isPostCreated) Icons.Default.Check else Icons.Default.Clear,
+                    onConfirm = { showDialog = false },
+                    onDismiss = { showDialog = false }
+                )
+            }
+
+            if (validationError) {
+                DialogSimple(
+                    title = "Error",
+                    text = "El contenido de la publicacion no cumple con los requisitos",
+                    icon = Icons.Default.Warning,
+                    onDismiss = {
+                        validationError = false
+                    },
+                    onConfirm = {
+                        validationError = false
+                    }
+                )
             }
         } else {
             Text(

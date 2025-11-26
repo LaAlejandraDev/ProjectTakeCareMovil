@@ -14,3 +14,10 @@ data class ChatModel(
     @SerializedName("ultimoMensajeEn")
     val lastMessageDate: String,
 )
+
+data class CreateChat (
+    @SerializedName("idPsicologo")
+    val idPsychologist: Int,
+    @SerializedName("idPaciente")
+    val idPatient: Int,
+)

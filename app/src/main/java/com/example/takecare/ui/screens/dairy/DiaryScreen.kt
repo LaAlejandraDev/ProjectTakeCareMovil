@@ -1,5 +1,6 @@
 package com.example.takecare.ui.screens.dairy
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -20,6 +21,7 @@ import com.example.takecare.ui.screens.dairy.sections.DiaryWriteSection
 import com.example.takecare.ui.screens.dairy.sections.IntroductionSection
 import com.example.takecare.ui.screens.psycologist.AlertDialogError
 import androidx.compose.runtime.collectAsState
+import com.example.takecare.ui.components.DialogSimple
 
 @Composable
 fun DiaryScreen(
@@ -38,7 +40,6 @@ fun DiaryScreen(
                     "Mañana tendrás un nuevo espacio para seguir expresándote."
         )
     }
-
     fun onNextSection() {
         if (sectionIndex > -1 && sectionIndex < 3) {
             sectionIndex++
@@ -46,6 +47,10 @@ fun DiaryScreen(
     }
 
     fun onCreateNewDiary() {
+        if (text.length < 10 || text.isEmpty()) {
+            return
+        }
+
         if (!text.isEmpty()) {
             onNextSection()
             val newDiary = DiaryInsertModel(

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.takecare.data.models.CreateComment
 import com.example.takecare.ui.components.DialogComponent
+import com.example.takecare.ui.components.DialogSimple
 import com.example.takecare.ui.screens.forum.components.OpenPost
 import com.example.takecare.ui.screens.forum.components.OpenPostActions
 import com.example.takecare.ui.screens.forum.components.OpenPostAvatarHeader
@@ -60,9 +61,13 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
         }
     }
 
+    fun closeDialog() {
+        showDialog = false
+        commentText = ""
+    }
+
     LaunchedEffect(openPost) {
         openPost?.let { forumViewModel.getPostComments(it.id) }
-        Log.i("DETAILSPOST", "Se obtuvo el id del usuario $userId")
     }
 
     Scaffold(
@@ -77,7 +82,7 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -94,12 +99,13 @@ fun ForumDetailsPost(forumViewModel: ForumViewModel, rootNavController: NavContr
                     OpenPostComments(comments)
                 }
                 if (showDialog) {
-                    DialogComponent(
+                    DialogSimple (
                         title = if (isCommentCreated) "Comentario publicado" else "No se pudo publicar el comentario",
-                        message = if (isCommentCreated) "Tu comentario se ha enviado correctamente."
+                        text = if (isCommentCreated) "Tu comentario se ha enviado correctamente."
                         else "Ocurrió un problema al enviar tu comentario. Por favor, inténtalo nuevamente más tarde.",
-                        confirmText = "Entendido",
-                        onConfirm = { showDialog = false })
+                        onConfirm = { closeDialog() },
+                        onDismiss = { closeDialog() }
+                    )
                 }
             } else {
                 ErrorPost()

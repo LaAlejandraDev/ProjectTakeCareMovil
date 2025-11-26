@@ -50,7 +50,6 @@ fun CommentComponent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Avatar(comment.user!!.getInitials(), size = 24.dp)
-            Text(comment.likes.toString(), style = MaterialTheme.typography.bodySmall)
         }
         Column {
             comment.user?.name?.let {

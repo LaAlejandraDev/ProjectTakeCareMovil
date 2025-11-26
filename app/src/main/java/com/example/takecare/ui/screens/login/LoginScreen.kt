@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,6 +36,7 @@ import com.composables.core.rememberDialogState
 import com.composeunstyled.Button
 import com.composeunstyled.Text
 import com.example.takecare.ui.components.DialogComponent
+import com.example.takecare.ui.components.DialogSimple
 import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.login.components.LoginCard
 import com.example.takecare.ui.screens.visualhelp.LoadingScreen
@@ -79,11 +82,12 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
         }
     }
     if (showDialog) {
-        DialogComponent(
-            title = "Error al iniciar sesión",
-            message = "No se pudo iniciar sesión. Revisa tus credenciales e intenta nuevamente.",
-            confirmText = "Entendido",
-            onConfirm = { showDialog = false }
+        DialogSimple (
+            title = "Error",
+            text = "Error al iniciar sesion, verifica tus credenciales",
+            icon = Icons.Default.Warning,
+            onConfirm = { showDialog = false },
+            onDismiss = { showDialog = false }
         )
     }
 }

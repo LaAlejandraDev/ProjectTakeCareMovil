@@ -83,11 +83,11 @@ fun DiaryWriteSection(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(
+        Button(
             onClick = { onSave() },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("Terminar")
+            Text("Terminar", color = Color.White)
         }
     }
 }

@@ -26,6 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +42,7 @@ import androidx.navigation.NavController
 import com.example.takecare.R
 import com.example.takecare.data.models.Comment
 import com.example.takecare.data.models.Post
+import com.example.takecare.ui.components.DialogCommentExpanded
 
 @Composable
 fun OpenPost(
@@ -95,7 +100,7 @@ fun OpenPostBody(openPost: Post?) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Creado " + (openPost.date ?: "desconocido"),
+            text = "Creado " + (openPost.date.slice(0..10).replace("-", "/").replace("T", " ") ?: "desconocido"),
             style = MaterialTheme.typography.bodySmall,
             color = Color.Gray
         )
@@ -124,27 +129,27 @@ fun OpenPostActions(openPost: Post?, commentsCount: Int) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(
-            onClick = { /* TODO: Acción de "Me gusta" */ },
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black
-            ),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "Me Gusta",
-                tint = Color.Black,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = likes.toString(),
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium)
-            )
-        }
+//        Button(
+//            onClick = { /* TODO: Acción de "Me gusta" */ },
+//            shape = RoundedCornerShape(50),
+//            colors = ButtonDefaults.buttonColors(
+//                containerColor = Color.White,
+//                contentColor = Color.Black
+//            ),
+//            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+//        ) {
+//            Icon(
+//                imageVector = Icons.Default.Favorite,
+//                contentDescription = "Me Gusta",
+//                tint = Color.Black,
+//                modifier = Modifier.size(20.dp)
+//            )
+//            Spacer(modifier = Modifier.width(6.dp))
+//            Text(
+//                text = likes.toString(),
+//                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium)
+//            )
+//        }
 
         BadgeIconComponent(
             type = BadgeType.Neutral,
@@ -200,6 +205,12 @@ fun OpenPostAvatarHeader(openPost: Post?) {
 
 @Composable
 fun OpenPostComments(postComments: List<Comment?>, modifier: Modifier = Modifier) {
+    var openDialog by remember { mutableStateOf(false) }
+    var commentSelected by remember { mutableStateOf<Comment?>(null) }
+
+    fun showFullComment() {
+        openDialog = true
+    }
 
     Surface(
         shape = RoundedCornerShape(12.dp),
@@ -237,8 +248,19 @@ fun OpenPostComments(postComments: List<Comment?>, modifier: Modifier = Modifier
                     }
                 } else {
                     safeComments.forEach { item ->
-                        CommentComponent(item, onClick = {})
+                        CommentComponent(item, onClick = {
+                            commentSelected = item
+                            showFullComment()
+                        })
                     }
+                }
+
+                if (openDialog) {
+                    DialogCommentExpanded(
+                        comment = commentSelected!!,
+                        onDismiss = { openDialog = false },
+                        onConfirm = { openDialog = false }
+                    )
                 }
             }
         }

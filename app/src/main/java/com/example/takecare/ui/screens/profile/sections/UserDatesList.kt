@@ -221,8 +221,8 @@ private fun DateListSectionFinished(
 
             items(patientDatesList) { item ->
                 DateListItem(item) { id ->
-                    onPressedDate(id)
-                    showDialog = true
+//                    onPressedDate(id)
+//                    showDialog = true
                 }
             }
         }

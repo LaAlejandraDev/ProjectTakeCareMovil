@@ -1,5 +1,6 @@
 package com.example.takecare.ui.screens.psycologist
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.takecare.data.models.AllData.PsycologistWorkDaysAllData
+import com.example.takecare.data.models.Insert.ChatModel
+import com.example.takecare.data.models.Insert.CreateChat
 import com.example.takecare.data.models.Insert.DateModelCreate
 import com.example.takecare.ui.Utils.formatLocalDateTime
 import java.time.LocalDate
@@ -67,11 +70,19 @@ fun PsycologistInfoScreen(
                 location = ubicacion.value
             )
 
+            val newChat = CreateChat(
+                psycologistId,
+                patientId,
+            )
+
             psycologistViewModel.createNewDate(newDate) { success ->
 
                 if (success) {
                     alertTitle.value = "Éxito"
                     alertContent.value = "La cita fue agendada correctamente."
+                    psycologistViewModel.createNewChat(newChat) { success ->
+                        Log.d("NEW_CHAT", "EL ESTATUS FUE: $success")
+                    }
                 } else {
                     alertTitle.value = "Error"
                     alertContent.value = "No se pudo registrar la cita. Inténtalo más tarde."

@@ -17,14 +17,14 @@ fun MessageComponent(
     owner: Boolean = false
 ) {
     val bubbleColor = if (owner)
-        MaterialTheme.colorScheme.primaryContainer
+        MaterialTheme.colorScheme.primary
     else
-        MaterialTheme.colorScheme.surfaceVariant
+        MaterialTheme.colorScheme.secondary
 
     val textColor = if (owner)
-        MaterialTheme.colorScheme.onPrimaryContainer
+        MaterialTheme.colorScheme.onPrimary
     else
-        MaterialTheme.colorScheme.onSurfaceVariant
+        MaterialTheme.colorScheme.onSecondary
 
     Row(
         modifier = Modifier
