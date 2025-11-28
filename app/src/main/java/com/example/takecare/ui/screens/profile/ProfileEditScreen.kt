@@ -72,7 +72,11 @@ fun ProfileScreen(
 
             else -> {
                 UserAvatarSection(patient)
-                UserDatesListSection(userDateList, diaryList)
+                UserDatesListSection(
+                    userDateList,
+                    diaryList,
+                    profileViewModel
+                )
             }
         }
     }

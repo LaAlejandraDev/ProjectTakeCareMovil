@@ -1,6 +1,5 @@
 package com.example.takecare.ui.screens.profile.sections
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,13 +35,17 @@ import androidx.compose.ui.unit.dp
 import com.composeunstyled.Text
 import com.example.takecare.data.models.AllData.DiaryAllDataModel
 import com.example.takecare.data.models.Insert.DateModelCreate
+import com.example.takecare.data.models.Insert.RatingModelCreate
+import com.example.takecare.ui.components.DialogSimple
+import com.example.takecare.ui.screens.profile.ProfileViewModel
 import com.example.takecare.ui.screens.profile.components.DialogValue
 import java.time.LocalDate
 
 @Composable
 fun UserDatesListSection(
     patientDatesList: List<DateModelCreate> = emptyList(),
-    diaryList: List<DiaryAllDataModel> = emptyList()
+    diaryList: List<DiaryAllDataModel> = emptyList(),
+    profileViewModel: ProfileViewModel
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val pendingDates = patientDatesList.filter { !it.isStartDateExpired() }
@@ -100,7 +103,10 @@ fun UserDatesListSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
-                    DateListSectionFinished(patientDatesList = finishedDates)
+                    DateListSectionFinished(
+                        patientDatesList = finishedDates,
+                        profileViewModel = profileViewModel
+                    )
                 }
             }
 
@@ -189,18 +195,41 @@ private fun DateListSection(
 
 @Composable
 private fun DateListSectionFinished(
-    patientDatesList: List<DateModelCreate> = emptyList()
+    patientDatesList: List<DateModelCreate> = emptyList(),
+    profileViewModel: ProfileViewModel
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    var idSelected by remember { mutableStateOf(-1) }
+    var openInfoDialog by remember { mutableStateOf(false) }
+    var dateSelect by remember { mutableStateOf<DateModelCreate?>(null) }
+    var dialogInfoTitle by remember { mutableStateOf("") }
+    var dialogInfoText by remember { mutableStateOf("") }
 
-    fun onPressedDate(id: Int) {
+    fun onPressedDate(dateSelected: DateModelCreate) {
         showDialog = true
-        idSelected = id
+        dateSelect = dateSelected
     }
 
     fun sendRating(rating: Int) {
-        //TODO: Enviar la calificacion al psicologo
+        if (rating == 0 || dateSelect == null) return
+
+        dateSelect?.let { data ->
+            val newRating = RatingModelCreate(
+                cal = rating,
+                psychologistId = data.psycologistId,
+                dateId = data.id
+            )
+
+            profileViewModel.createNewRating(newRating) { success ->
+                openInfoDialog = true
+                if (success) {
+                    dialogInfoTitle = "Exito"
+                    dialogInfoText = "Tu valoración se envio con exito"
+                } else {
+                    dialogInfoTitle = "Error"
+                    dialogInfoText = "Hubo un error al enviar tu valoración"
+                }
+            }
+        }
     }
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -219,10 +248,21 @@ private fun DateListSectionFinished(
                 }
             }
 
+            item {
+                if (openInfoDialog) {
+                    DialogSimple(
+                        title = dialogInfoTitle,
+                        text = dialogInfoText,
+                        onConfirm = { openInfoDialog = false },
+                        onDismiss = { openInfoDialog = false }
+                    )
+                }
+            }
+
             items(patientDatesList) { item ->
                 DateListItem(item) { id ->
-//                    onPressedDate(id)
-//                    showDialog = true
+                    onPressedDate(item)
+                    showDialog = true
                 }
             }
         }

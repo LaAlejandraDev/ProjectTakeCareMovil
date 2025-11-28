@@ -2,10 +2,12 @@ package com.example.takecare.ui.screens.profile
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.res.integerResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
 import com.example.takecare.data.models.Insert.DateModelCreate
+import com.example.takecare.data.models.Insert.RatingModelCreate
 import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.User
 import com.example.takecare.ui.Utils.SessionManager
@@ -107,6 +109,21 @@ class ProfileViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val data = response.body() ?: emptyList()
                     _patientDateList.value = data
+                    onResult(true)
+                } else {
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                onResult(false)
+            }
+        }
+    }
+
+    fun createNewRating(rating: RatingModelCreate, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.ApiServerUsers.createNewRating(rating)
+                if (response.isSuccessful) {
                     onResult(true)
                 } else {
                     onResult(false)

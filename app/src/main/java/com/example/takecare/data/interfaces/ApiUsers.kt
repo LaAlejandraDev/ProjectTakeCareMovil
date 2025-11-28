@@ -3,6 +3,8 @@ package com.example.takecare.data.interfaces
 import com.example.takecare.data.models.AllData.DiaryAllDataModel
 import com.example.takecare.data.models.Insert.DiaryInsertModel
 import com.example.takecare.data.models.Insert.DateModelCreate
+import com.example.takecare.data.models.Insert.RatingModelCreate
+import com.example.takecare.data.models.Insert.RatingModelInfo
 import com.example.takecare.data.models.PatientModel
 import com.example.takecare.data.models.User
 import retrofit2.Response
@@ -35,4 +37,7 @@ interface ApiUsers {
 
     @GET("DiarioEmocionals/paciente/{idPaciente}")
     suspend fun getDiaryList(@Path("idPaciente") id: Int): Response<List<DiaryAllDataModel>>
+
+    @POST("Valoraciones")
+    suspend fun createNewRating(@Body newRating: RatingModelCreate): Response<RatingModelInfo>
 }
