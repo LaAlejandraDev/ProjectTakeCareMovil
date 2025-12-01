@@ -6,6 +6,9 @@ data class User(
     @SerializedName("id")
     val id: Int? = null,
 
+    @SerializedName("fotoUrl")
+    val imageUrl: String? = null,
+
     @SerializedName("nombre")
     val name: String? = null,
 

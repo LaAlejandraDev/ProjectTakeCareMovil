@@ -2,6 +2,7 @@ package com.example.takecare.ui.screens.home
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,7 +17,7 @@ import com.example.takecare.ui.screens.psycologist.PsycoListScreen
 import com.example.takecare.ui.screens.psycologist.PsycologistInfoScreen
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(mainNavController: NavController) {
     val rootNavController = rememberNavController()
 
     val forumViewModel: ForumViewModel = viewModel()
@@ -26,7 +27,7 @@ fun HomeScreen() {
         startDestination = "main_scaffold"
     ) {
         composable("main_scaffold") {
-            AppScaffoldNavHost(rootNavController, forumViewModel)
+            AppScaffoldNavHost(rootNavController, forumViewModel, mainNavController)
         }
 
         composable(HomeRoutes.OpenPost.route) {

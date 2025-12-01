@@ -34,7 +34,7 @@ fun UserAvatarSection(patient: PatientModel?) {
     ) {
         when {
             patient != null -> {
-                UserHeader(patientName, patientFullName)
+                UserHeader(patientName, patientFullName, patient.user?.imageUrl ?: "")
             }
 
             else -> {
@@ -47,7 +47,8 @@ fun UserAvatarSection(patient: PatientModel?) {
 @Composable
 private fun UserHeader(
     patientName: String,
-    fullPatientName: String
+    fullPatientName: String,
+    patientImage: String = ""
 ) {
     Surface (
         modifier = Modifier.fillMaxWidth(),
@@ -59,7 +60,7 @@ private fun UserHeader(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Avatar(patientName.firstOrNull()?.toString() ?: "?", size = 50.dp)
+            Avatar(patientName.firstOrNull()?.toString() ?: "?", size = 50.dp, imageUrl = patientImage)
             Column {
                 Text(
                     fullPatientName,

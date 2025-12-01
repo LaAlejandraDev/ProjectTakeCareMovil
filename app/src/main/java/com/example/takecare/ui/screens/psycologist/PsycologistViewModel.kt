@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class PsycologistViewModel : ViewModel() {
     private val _patientId = MutableStateFlow(0)
@@ -80,59 +81,59 @@ class PsycologistViewModel : ViewModel() {
         }
     }
 
-    fun createNewDate(date: DateModelCreate, onResponse: (Boolean) -> Unit) {
+    fun createNewDate(
+        date: DateModelCreate,
+        onResponse: (Boolean, String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 Log.d("DATE_DEBUG", date.toString())
 
-                Log.d("DATE_DEBUG", """
-                ⬆️ Enviando petición para crear cita
-                ├── PsycologistId: ${date.psycologistId}
-                ├── PatientId: ${date.patientId}
-                ├── WorkDayId: ${date.workDayId}
-                ├── Fecha: ${date.startDate}
-                ├── Motivo: ${date.reason}
-                ├── Lugar: ${date.location}
-            """.trimIndent())
-
                 val response = RetrofitClient.ApiServerPsycologist.createNewDate(date)
 
                 if (response.isSuccessful) {
-                    Log.d("DATE_DEBUG", """
-                    ✅ Cita creada exitosamente
-                    ├── Código: ${response.code()}
-                    └── Mensaje: ${response.message()}
-                """.trimIndent())
 
-                    onResponse(true)
+                    val body = response.body()
+                    val message = when {
+                        body is Map<*, *> && body["message"] is String -> body["message"] as String
+                        body != null -> body.toString()
+                        else -> "Cita creada correctamente"
+                    }
+
+                    Log.d("DATE_DEBUG", "Cita creada: $message")
+                    onResponse(true, "Cita creada correctamente el dia ${date.startDate} - ${date.endDate}")
 
                 } else {
+                    // EXTRAER MENSAJE DEL ERROR DEL SERVIDOR
                     val errorBody = response.errorBody()?.string()
+                    var errorMessage = "Error desconocido"
+
+                    try {
+                        if (!errorBody.isNullOrBlank()) {
+                            val jsonObj = JSONObject(errorBody)
+
+                            errorMessage =
+                                jsonObj.optString("message") // ← mensaje típico backend
+                                    ?: jsonObj.optString("error")
+                                            ?: jsonObj.toString()
+                        }
+                    } catch (e: Exception) {
+                        errorMessage = errorBody ?: "Error desconocido"
+                    }
 
                     Log.e("DATE_ERROR", """
                     ❌ Error al crear la cita
-                    ├── Código: ${response.code()}
-                    ├── Mensaje: ${response.message()}
-                    ├── URL: ${response.raw().request.url}
-                    ├── Método: ${response.raw().request.method}
-                    └── ErrorBody:
-                        $errorBody
+                    Código: ${response.code()}
+                    Mensaje del servidor: $errorMessage
                 """.trimIndent())
 
-                    onResponse(false)
+                    onResponse(false, errorMessage)
                 }
 
             } catch (e: Exception) {
-                Log.e("DATE_ERROR_SERVER", """
-                💥 Excepción al conectar con el servidor
-                ├── Tipo: ${e::class.java.simpleName}
-                ├── Mensaje: ${e.message}
-                └── Stacktrace:
-            """.trimIndent())
 
-                e.printStackTrace()
-
-                onResponse(false)
+                Log.e("DATE_ERROR_SERVER", "Excepción: ${e.message}")
+                onResponse(false, "Error al conectar con el servidor")
             }
         }
     }

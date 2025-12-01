@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -40,7 +41,7 @@ import com.example.takecare.ui.screens.profile.ProfileScreen
 import kotlinx.coroutines.coroutineScope
 
 @Composable
-fun AppScaffoldNavHost(rootNavController : NavController, forumViewModel: ForumViewModel) {
+fun AppScaffoldNavHost(rootNavController : NavController, forumViewModel: ForumViewModel, mainNavController: NavController  ) {
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
@@ -88,6 +89,8 @@ fun AppScaffoldNavHost(rootNavController : NavController, forumViewModel: ForumV
                         )
                     }
                     FloatingActionButton (
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White,
                         onClick = { rootNavController.navigate("psyco_list") }
                     ) {
                         Icon(
@@ -107,7 +110,7 @@ fun AppScaffoldNavHost(rootNavController : NavController, forumViewModel: ForumV
             composable(HomeRoutes.Home.route) { ForumScreen(forumViewModel, rootNavController) }
             composable(HomeRoutes.Messages.route) { MessagesScreen(rootNavController) }
             composable(HomeRoutes.Diary.route) { DiaryScreen(navController) }
-            composable(HomeRoutes.Profile.route) { ProfileScreen(rootNavController) }
+            composable(HomeRoutes.Profile.route) { ProfileScreen(rootNavController, mainNavController = mainNavController) }
             composable(HomeRoutes.CreatePost.route) { ForumCreatePost() }
         }
     }

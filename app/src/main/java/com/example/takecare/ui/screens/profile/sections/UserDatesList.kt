@@ -15,14 +15,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,8 +37,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.composeunstyled.Text
 import com.example.takecare.data.models.AllData.DiaryAllDataModel
 import com.example.takecare.data.models.Insert.DateModelCreate
@@ -45,11 +54,17 @@ import java.time.LocalDate
 fun UserDatesListSection(
     patientDatesList: List<DateModelCreate> = emptyList(),
     diaryList: List<DiaryAllDataModel> = emptyList(),
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    onLogOut: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val pendingDates = patientDatesList.filter { !it.isStartDateExpired() }
     val finishedDates = patientDatesList.filter { it.isStartDateExpired() }
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        profileViewModel.selectUser(context)
+    }
 
     Column(
         modifier = Modifier
@@ -64,19 +79,45 @@ fun UserDatesListSection(
             Tab(
                 selected = selectedTab == 0,
                 onClick = { selectedTab = 0 },
-                text = { Text("Pendientes") }
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Pendientes",
+                    )
+                }
             )
 
             Tab(
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
-                text = { Text("Terminadas") }
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Terminadas",
+                    )
+                }
             )
 
             Tab(
                 selected = selectedTab == 2,
                 onClick = { selectedTab = 2 },
-                text = { Text("Diario") }
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Create,
+                        contentDescription = "Diario",
+                    )
+                }
+            )
+
+            Tab(
+                selected = selectedTab == 3,
+                onClick = { selectedTab = 3 },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Configuracion",
+                    )
+                }
             )
         }
 
@@ -120,6 +161,13 @@ fun UserDatesListSection(
                 } else {
                     UserDiaryRegistryScreen(diaryList)
                 }
+            }
+
+            3 -> {
+                ConfigurationSection(
+                    profileViewModel,
+                    onLogOut
+                )
             }
         }
     }
@@ -359,5 +407,88 @@ private fun DateListItem(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ConfigurationSection(
+    profileViewModel: ProfileViewModel,
+    onLogOut: () -> Unit
+) {
+    val context = LocalContext.current
+    var newUrl by remember { mutableStateOf("") }
+    var openDialog by remember { mutableStateOf(false) }
+    var titleDialog by remember { mutableStateOf("title") }
+    var dialogContent by remember { mutableStateOf("Content") }
+
+    fun updateUserImage() {
+        if (!newUrl.isEmpty()) {
+            profileViewModel.updateImageUrl(newUrl) { success ->
+                if (success) {
+                    openDialog = true
+                    titleDialog = "Error"
+                    dialogContent = "Error al actualizar la imagen, intentalo mas tarde"
+                } else {
+                    openDialog = true
+                    titleDialog = "Error"
+                    dialogContent = "Error al actualizar la imagen, intentalo mas tarde"
+                }
+            }
+        } else {
+            openDialog = true
+            titleDialog = "Error"
+            dialogContent = "No se puede dejar la url vacia"
+        }
+    }
+
+    Column (
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text("Configuración", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+
+        Column (verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("Modificar foto de perfil", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+            OutlinedTextField(
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("URL de la foto", color = Color.Gray) },
+                value = newUrl,
+                onValueChange = { newUrl = it },
+            )
+            Button(
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { updateUserImage() }
+            ) {
+                Text("Modificar", color = Color.White)
+            }
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                "Cerrar la sesión",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            Button(
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    profileViewModel.closeSession(context)
+                    onLogOut()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text("Cerrar Sesión", color = Color.White)
+            }
+        }
+    }
+
+    if (openDialog) {
+        DialogSimple(
+            title = titleDialog,
+            text = dialogContent,
+            onDismiss = { openDialog = false },
+            onConfirm = { openDialog = false }
+        )
     }
 }

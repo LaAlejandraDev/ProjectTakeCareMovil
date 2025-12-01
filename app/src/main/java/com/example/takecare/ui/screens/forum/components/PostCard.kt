@@ -79,7 +79,7 @@ fun CardHeader(postData: Post) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Avatar(user?.getInitials() ?: "")
+            Avatar(user.getInitials(), imageUrl = user.imageUrl ?: "")
             Column {
                 Text(
                     user?.name ?: "Usuario desconocido",

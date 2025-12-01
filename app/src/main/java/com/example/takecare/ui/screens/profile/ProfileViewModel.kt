@@ -3,6 +3,7 @@ package com.example.takecare.ui.screens.profile
 import android.content.Context
 import android.util.Log
 import androidx.compose.ui.res.integerResource
+import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.takecare.data.client.RetrofitClient
@@ -63,6 +64,7 @@ class ProfileViewModel : ViewModel() {
                     val response = RetrofitClient.ApiServerUsers.getPatient(idUser)
                     if (response.isSuccessful) {
                         _selectedPatient.value = response.body()
+                        Log.e("GET_PATIENT", "Informacion del paciente " + response.body())
                     } else {
                         Log.e("GET_PATIENT", "Error al obtener el usuario " + response.message())
                     }
@@ -129,6 +131,30 @@ class ProfileViewModel : ViewModel() {
                     onResult(false)
                 }
             } catch (e: Exception) {
+                onResult(false)
+            }
+        }
+    }
+
+    fun updateImageUrl(url: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val idUser = _selectedUser.value?.id
+            try {
+                Log.d("ID_USER_INIT", "ID: $idUser")
+                if (idUser != null) {
+                    val response = RetrofitClient.ApiServerUsers.updateImageUrl(idUser, url)
+                    Log.d("IMAGE", "ID: $idUser, IMAGE: $url")
+                    Log.d("IMAGE_RESPONSE", "$response.message() $response.code()")
+                    if (response.isSuccessful) {
+                        onResult(true)
+                    } else {
+                        onResult(false)
+                    }
+                } else {
+                    Log.d("ID_USER_ERROR", "ID: $idUser")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
                 onResult(false)
             }
         }

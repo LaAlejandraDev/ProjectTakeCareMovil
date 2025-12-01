@@ -45,6 +45,10 @@ android {
 }
 
 dependencies {
+    implementation("com.github.jeziellago:compose-markdown:0.5.0")
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
     implementation("com.composables:core:1.47.1")
 
     implementation("com.microsoft.signalr:signalr:7.0.5")
@@ -68,6 +72,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
     implementation("androidx.activity:activity-compose:1.9.2")
+    implementation(libs.volley)
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

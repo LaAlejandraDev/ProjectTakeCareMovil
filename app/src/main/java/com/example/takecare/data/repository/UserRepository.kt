@@ -46,4 +46,8 @@ class UserRepository(private val apiUsers: ApiUsers) {
     suspend fun createNewRating(rating: RatingModelCreate): Response<RatingModelInfo> {
         return apiUsers.createNewRating(rating)
     }
+
+    suspend fun updateImageUrl(url: String, userId: Int): Response<String> {
+        return apiUsers.updateImageUrl(userId, url)
+    }
 }

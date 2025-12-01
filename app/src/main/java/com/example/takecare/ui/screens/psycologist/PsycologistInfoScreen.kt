@@ -48,6 +48,7 @@ fun PsycologistInfoScreen(
     val selectedDate = remember { mutableStateOf<String?>(null) }
     val motivo = remember { mutableStateOf("") }
     val ubicacion = remember { mutableStateOf("Presencial") }
+    val horario = remember { mutableStateOf("7:00 AM") }
 
     val patientId = psycologistViewModel.patientId.collectAsState().value
 
@@ -58,34 +59,39 @@ fun PsycologistInfoScreen(
 
     fun createNewDate(workDay: PsycologistWorkDaysAllData) {
         if (psycologistId != null) {
+
+            val (startDateParsed, endDateParsed) =
+                generarFechaConHorario(workDay.date, horario.value)
+
             val newDate = DateModelCreate(
                 id = 0,
                 psycologistId = psycologistId,
                 patientId = patientId,
                 workDayId = workDay.id,
-                startDate = workDay.date,
-                endDate = workDay.date,
+                startDate = startDateParsed.toString(),
+                endDate = endDateParsed.toString(),
                 status = "Creado",
                 reason = motivo.value,
                 location = ubicacion.value
             )
+
+            Log.d("NEW_DATE_MODEL", newDate.toString())
 
             val newChat = CreateChat(
                 psycologistId,
                 patientId,
             )
 
-            psycologistViewModel.createNewDate(newDate) { success ->
-
+            psycologistViewModel.createNewDate(newDate) { success, response ->
                 if (success) {
                     alertTitle.value = "Éxito"
-                    alertContent.value = "La cita fue agendada correctamente."
+                    alertContent.value = response
                     psycologistViewModel.createNewChat(newChat) { success ->
                         Log.d("NEW_CHAT", "EL ESTATUS FUE: $success")
                     }
                 } else {
                     alertTitle.value = "Error"
-                    alertContent.value = "No se pudo registrar la cita. Inténtalo más tarde."
+                    alertContent.value = response
                 }
 
                 openAlertDialog.value = true
@@ -126,6 +132,8 @@ fun PsycologistInfoScreen(
                     onMotivoChange = { motivo.value = it },
                     ubicacion = ubicacion.value,
                     onUbicacionChange = { ubicacion.value = it },
+                    horarioSeleccionado = horario.value,
+                    onHorarioSeleccionadoChange = { horario.value = it },
                     onCancelar = { openSheet.value = false },
                     onAgregar = {
                         selectedDate.value?.let { dateValue ->
@@ -186,6 +194,8 @@ fun AgendaSheetContent(
     onMotivoChange: (String) -> Unit,
     ubicacion: String,
     onUbicacionChange: (String) -> Unit,
+    horarioSeleccionado: String,
+    onHorarioSeleccionadoChange: (String) -> Unit,
     onCancelar: () -> Unit,
     onAgregar: () -> Unit
 ) {
@@ -201,20 +211,31 @@ fun AgendaSheetContent(
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
         )
 
+        // MOTIVO
         OutlinedTextField(
             value = motivo,
             onValueChange = onMotivoChange,
             label = { Text("Motivo de la cita") },
-            modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 100.dp)
         )
 
-        var expanded by remember { mutableStateOf(false) }
-        val opciones = listOf("Presencial", "Virtual")
+        // UBICACIÓN
+        var expandedUbicacion by remember { mutableStateOf(false) }
+        val opcionesUbicacion = listOf("Presencial", "Virtual")
 
-        Text("Lugar de la cita", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+        val horarios = remember { generarHorariosDosHoras() }
+        var expandedHorario by remember { mutableStateOf(false) }
+
+        Text(
+            "Lugar de la cita",
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+        )
+
         Box {
             OutlinedButton(
-                onClick = { expanded = true },
+                onClick = { expandedUbicacion = true },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -222,21 +243,49 @@ fun AgendaSheetContent(
             }
 
             DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+                expanded = expandedUbicacion,
+                onDismissRequest = { expandedUbicacion = false }
             ) {
-                opciones.forEach { opcion ->
+                opcionesUbicacion.forEach { opcion ->
                     DropdownMenuItem(
                         text = { Text(opcion) },
                         onClick = {
                             onUbicacionChange(opcion)
-                            expanded = false
+                            expandedUbicacion = false
                         }
                     )
                 }
             }
         }
 
+        Text("Horario", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+
+        Box {
+            OutlinedButton(
+                onClick = { expandedHorario = true },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(horarioSeleccionado)
+            }
+
+            DropdownMenu(
+                expanded = expandedHorario,
+                onDismissRequest = { expandedHorario = false }
+            ) {
+                horarios.forEach { opcion ->
+                    DropdownMenuItem(
+                        text = { Text(opcion) },
+                        onClick = {
+                            onHorarioSeleccionadoChange(opcion)
+                            expandedHorario = false
+                        }
+                    )
+                }
+            }
+        }
+
+        // BOTONES
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
@@ -257,7 +306,6 @@ fun AgendaSheetContent(
         }
     }
 }
-
 
 @Composable
 fun DayItem(data: PsycologistWorkDaysAllData, onNewDate: () -> Unit) {
@@ -309,3 +357,62 @@ fun DayItem(data: PsycologistWorkDaysAllData, onNewDate: () -> Unit) {
         }
     }
 }
+
+private fun generarFechaConHorario(
+    fecha: String,
+    rango: String
+): Pair<LocalDateTime, LocalDateTime> {
+
+    val (horaInicioStr, horaFinStr) = rango.split(" - ")
+
+    val date = LocalDate.parse(fecha.substring(0, 10)) // yyyy-MM-dd
+
+    val horaInicio = convertirHora12a24(horaInicioStr)
+    val horaFin = convertirHora12a24(horaFinStr)
+
+    val inicio = date.atTime(horaInicio, 0)
+    val fin = date.atTime(horaFin, 0)
+
+    return Pair(inicio, fin)
+}
+
+private fun convertirHora12a24(hora: String): Int {
+    val partes = hora.split(" ")
+    val horaNum = partes[0].replace(":00", "").toInt()
+    val periodo = partes[1]
+
+    return when (periodo) {
+        "AM" -> if (horaNum == 12) 0 else horaNum
+        "PM" -> if (horaNum == 12) 12 else horaNum + 12
+        else -> horaNum
+    }
+}
+
+fun generarHorariosDosHoras(): List<String> {
+    val horarios = mutableListOf<String>()
+
+    // 7 AM a 3 PM -> intervalos de 2 horas
+    val startHours = listOf(7, 9, 11, 13) // 1 PM = 13 hrs
+
+    for (start in startHours) {
+        val end = start + 2
+
+        val startLabel = formatHour(start)
+        val endLabel = formatHour(end)
+
+        horarios.add("$startLabel - $endLabel")
+    }
+
+    return horarios
+}
+
+private fun formatHour(hour: Int): String {
+    val period = if (hour < 12) "AM" else "PM"
+    val hour12 = when {
+        hour == 0 -> 12
+        hour > 12 -> hour - 12
+        else -> hour
+    }
+    return String.format("%d:00 %s", hour12, period)
+}
+

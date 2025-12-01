@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.takecare.ui.navigation.Routes
 import com.example.takecare.ui.screens.dairy.DiaryViewModel
 import com.example.takecare.ui.screens.profile.sections.UserAvatarSection
 import com.example.takecare.ui.screens.profile.sections.UserDatesListSection
@@ -23,7 +24,8 @@ import kotlinx.coroutines.delay
 fun ProfileScreen(
     rootNavController: NavController,
     profileViewModel: ProfileViewModel = viewModel(),
-    diaryViewModel: DiaryViewModel = viewModel()
+    diaryViewModel: DiaryViewModel = viewModel(),
+    mainNavController: NavController
 ) {
     val context = LocalContext.current
     val patient = profileViewModel.selectedPatient.collectAsState().value
@@ -31,6 +33,12 @@ fun ProfileScreen(
     val userDateList = profileViewModel.patientDateList.collectAsState().value
     val openAlertDialog = remember { mutableStateOf(false) }
     val diaryList = diaryViewModel.diaryList.collectAsState().value
+
+    fun onLogOut() {
+        mainNavController.navigate(Routes.Login.route) {
+            popUpTo(0) { inclusive = true }
+        }
+    }
 
     LaunchedEffect(Unit) {
         profileViewModel.getPatient(context)
@@ -48,6 +56,8 @@ fun ProfileScreen(
                 Log.e("LIST", "ERROR")
             }
         }
+
+        Log.d("PATIENT_DATA", patient.toString())
     }
 
     Column(
@@ -75,7 +85,8 @@ fun ProfileScreen(
                 UserDatesListSection(
                     userDateList,
                     diaryList,
-                    profileViewModel
+                    profileViewModel,
+                    { onLogOut() }
                 )
             }
         }

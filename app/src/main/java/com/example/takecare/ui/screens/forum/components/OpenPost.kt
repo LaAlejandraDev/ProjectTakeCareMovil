@@ -5,21 +5,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,13 +30,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.takecare.R
 import com.example.takecare.data.models.Comment
 import com.example.takecare.data.models.Post
 import com.example.takecare.ui.components.DialogCommentExpanded
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun OpenPost(
@@ -110,11 +104,14 @@ fun OpenPostBody(openPost: Post?) {
             fontWeight = FontWeight.Bold
         )
         BadgeComponent(openPost.getPostTypeText(openPost.type) ?: "Desconocido", BadgeType.Neutral)
-        Text(
-            text = openPost.content ?: "",
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Justify,
-            color = Color.Gray
+//        Text(
+//            text = openPost.content ?: "",
+//            style = MaterialTheme.typography.bodyMedium,
+//            textAlign = TextAlign.Justify,
+//            color = Color.Gray
+//        )
+        MarkdownText(
+            markdown = openPost.content ?: "",
         )
     }
 }

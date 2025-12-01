@@ -1,6 +1,8 @@
 package com.example.takecare.ui.screens.psycologist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,12 +12,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,11 +38,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.takecare.data.models.AllData.PsycologistAllData
+import com.example.takecare.ui.screens.forum.components.Avatar
 import com.example.takecare.ui.screens.psycologist.components.TopBarPsyco
+import okhttp3.internal.userAgent
 
 @Composable
 fun PsycoListScreen(
@@ -127,13 +134,34 @@ fun PsycoListItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         shape = MaterialTheme.shapes.medium
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF2C1F3B), shape = RoundedCornerShape(topEnd = 12.dp, topStart = 12.dp))
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            psycoData.user?.let { data ->
+                Avatar(
+                    initials = data.name?.take(1) ?: "?",
+                    imageUrl = data.imageUrl ?: ""
+                )
+                Text("${data.name} ${data.firstLastName} ${data.secondLastName}", color = Color.White)
+            }
+        }
 
+        Column (
+            modifier.padding(12.dp)
+        ) {
             Text(
-                text = psycoData.speciality,
-                style = MaterialTheme.typography.titleMedium
+                text = psycoData.speciality.uppercase(),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -146,8 +174,8 @@ fun PsycoListItem(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Column (
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -156,7 +184,7 @@ fun PsycoListItem(
                 )
                 Text(
                     text = psycoData.university,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
                 )
             }
 
@@ -168,7 +196,8 @@ fun PsycoListItem(
                 repeat(psycoData.rating.toInt()) {
                     Icon(
                         imageVector = Icons.Default.Star,
-                        contentDescription = "Star"
+                        contentDescription = "Star",
+                        tint = Color.Yellow
                     )
                 }
                 if (psycoData.rating % 1 != 0f) {
@@ -198,11 +227,11 @@ fun PsycoListItem(
                 style = MaterialTheme.typography.labelSmall
             )
 
-            OutlinedButton (
+            Button (
                 modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                 onClick = { navController.navigate("psyco_info/${psycoData.id}/${psycoData.speciality}") }
             ) {
-                Text("Reservar una cita", color = Color.Black)
+                Text("Reservar una cita", color = Color.White)
             }
         }
     }

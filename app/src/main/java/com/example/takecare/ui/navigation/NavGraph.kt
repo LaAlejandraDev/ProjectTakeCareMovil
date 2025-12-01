@@ -16,7 +16,6 @@ import com.example.takecare.ui.screens.register.RegisterScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController, loginViewModel: LoginViewModel = viewModel()) {
-
     NavHost(
         navController = navController,
         startDestination = Routes.Login.route
@@ -28,7 +27,7 @@ fun AppNavGraph(navController: NavHostController, loginViewModel: LoginViewModel
             RegisterScreen(navController)
         }
         composable(Routes.Home.route) {
-            HomeScreen()
+            HomeScreen(navController)
         }
     }
 }

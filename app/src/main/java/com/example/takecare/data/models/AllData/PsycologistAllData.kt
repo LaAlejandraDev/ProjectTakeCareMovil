@@ -1,5 +1,6 @@
 package com.example.takecare.data.models.AllData
 
+import com.example.takecare.data.models.User
 import com.google.gson.annotations.SerializedName
 
 data class PsycologistAllData (
@@ -31,5 +32,8 @@ data class PsycologistAllData (
     val rating: Float,
 
     @SerializedName("totalResenas")
-    val totalReviews: Int
+    val totalReviews: Int,
+
+    @SerializedName("usuario")
+    val user: User?
 )
