@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.math.log
 
 object SignalRManager {
-    private const val HUB_URL = "http://192.168.0.107:5002/chatHub"
+    private const val HUB_URL = "https://chc92xn0-5002.usw3.devtunnels.ms/chatHub"
     private var hubConnection: HubConnection? = null
     private val gson = Gson()
 

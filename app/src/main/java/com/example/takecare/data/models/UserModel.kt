@@ -51,8 +51,8 @@ data class User(
 
         return when (index) {
             0 -> UserType.PATIENT.displayName
-            1 -> UserType.PSICOLOGIST.displayName
-            2 -> UserType.ADMIN.displayName
+            2 -> UserType.PSICOLOGIST.displayName
+            1 -> UserType.ADMIN.displayName
             else -> "Desconocido"
         }
     }

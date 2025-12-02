@@ -20,11 +20,6 @@ fun BottomTabBar(navController: NavController, currentRoute: String?) {
         selectedTabIndex = selectedIndex,
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = Color.Black,
-        modifier = Modifier
-            .border(
-                width = 0.5.dp,
-                color = Color.Gray.copy(alpha = 0.5f)
-            ),
     ) {
         items.forEachIndexed { index, item ->
             Tab(
@@ -37,7 +32,13 @@ fun BottomTabBar(navController: NavController, currentRoute: String?) {
                         }
                     }
                 },
-                icon = { Icon(painterResource(id = item.icon), contentDescription = item.label) },
+                icon = {
+                    Icon(
+                        painterResource(id = item.icon),
+                        contentDescription = item.label,
+                        tint = if (currentRoute == item.route) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.primary
+                    )
+                },
                 text = { Text(item.label, fontWeight = FontWeight.Thin) }
             )
         }
